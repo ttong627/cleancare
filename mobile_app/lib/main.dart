@@ -26,14 +26,18 @@ class CleanCareApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF14B8A6), // 브랜드 틸 컬러 (로고 색상)
-          primary: const Color(0xFF2563EB),   // 브랜드 블루
+          seedColor: const Color(0xFF005BB7),
+          primary: const Color(0xFF00448C),   // Deep Ocean Blue
+          secondary: const Color(0xFF7DD3FC), // Sky Blue
+          background: const Color(0xFFF8F9FF),
+          surface: Colors.white,
+          onSurface: const Color(0xFF0B1C30),
           brightness: Brightness.light,
         ),
         useMaterial3: true,
-        fontFamily: 'Roboto',
+        fontFamily: 'Roboto', // Hanken Grotesk 대용
       ),
-      home: const WorkerHomeScreen(), // 테스트를 위해 임시로 홈 스크린으로 직행
+      home: const WorkerHomeScreen(), 
     );
   }
 }
@@ -61,8 +65,6 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
 
   Future<void> _fetchLocationAndWeather() async {
     try {
-      // 위치 권한 확인 및 요청
-      // Web 테스트 환경 등에서는 에러가 날 수 있으므로 예외 처리 (Zero-Loading)
       bool serviceEnabled;
       LocationPermission permission;
 
@@ -83,16 +85,12 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
         throw Exception('Location permissions are permanently denied.');
       }
 
-      // 현재 위치 가져오기
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       
-      // 실제 배포 시에는 백엔드(Cloud Run)를 통해 OpenWeather API 호출
-      // 현재는 API 키가 없으므로 프론트엔드 목업 데이터로 대체하되, 로직 구조는 완성
       await Future.delayed(const Duration(seconds: 1)); 
       
       if (mounted) {
         setState(() {
-          // 위도/경도를 기반으로 가져온 지역명 (Mock)
           _weatherLocation = position.latitude > 37 ? '서울특별시 강남구' : '경기도 수원시';
           _weatherTemp = '22.5°C';
           _weatherDesc = '현재 위치 기반: 맑음, 외부 청소하기 좋습니다!';
@@ -116,35 +114,36 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
-        toolbarHeight: 70, // 헤더 높이 대폭 증가 (장갑 터치 고려)
+        toolbarHeight: 70, 
         title: Image.asset(
-          'assets/images/logo-ko-h.png',
-          height: 36,
+          'assets/images/logo1.png',
+          height: 44,
           errorBuilder: (context, error, stackTrace) => 
-            const Text('크린케어', style: TextStyle(color: Color(0xFF14B8A6), fontWeight: FontWeight.w900, fontSize: 28)),
+            const Text('크린케어', style: TextStyle(color: Color(0xFF005BB7), fontWeight: FontWeight.w900, fontSize: 28)),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Color(0xFF1E293B), size: 32), 
+        centerTitle: false,
+        iconTheme: const IconThemeData(color: Color(0xFF0B1C30), size: 32), 
         actions: [
           IconButton(
             iconSize: 32, 
             padding: const EdgeInsets.all(16),
-            icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
+            icon: const Icon(Icons.notifications_none, color: Color(0xFF0B1C30)),
             onPressed: () {},
           )
         ],
       ),
-      // 어쩌다 한 번 쓰는 기능을 위한 사이드바(Drawer) 메뉴 추가
       drawer: Drawer(
+        backgroundColor: const Color(0xFFF8F9FF),
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
               decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Color(0xFF14B8A6), Color(0xFF2563EB)]),
+                gradient: LinearGradient(colors: [Color(0xFF005BB7), Color(0xFF00448C)]),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +152,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                   CircleAvatar(
                     radius: 30,
                     backgroundColor: Colors.white,
-                    child: Icon(Icons.person, size: 40, color: Color(0xFF14B8A6)),
+                    child: Icon(Icons.person, size: 40, color: Color(0xFF005BB7)),
                   ),
                   SizedBox(height: 12),
                   Text('김철수 팀장', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
@@ -162,35 +161,35 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               ),
             ),
             ListTile(
-              leading: const Icon(Icons.home, size: 28),
-              title: const Text('홈 화면', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              leading: const Icon(Icons.home, size: 28, color: Color(0xFF0B1C30)),
+              title: const Text('홈 화면', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30))),
               onTap: () => Navigator.pop(context),
             ),
-            const Divider(),
+            const Divider(color: Color(0xFFC2C6D4)),
             ListTile(
-              leading: const Icon(Icons.print, color: Color(0xFF2563EB), size: 28),
-              title: const Text('현장 모바일 팩스 전송', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2563EB))),
-              subtitle: const Text('관공서 및 교육청 제출용'),
+              leading: const Icon(Icons.print, color: Color(0xFF005BB7), size: 28),
+              title: const Text('현장 모바일 팩스 전송', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF005BB7))),
+              subtitle: const Text('관공서 및 교육청 제출용', style: TextStyle(color: Color(0xFF424752))),
               onTap: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('관공서 팩스 전송 화면으로 이동합니다.'),
-                    backgroundColor: Color(0xFF2563EB),
+                    backgroundColor: Color(0xFF005BB7),
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
               },
             ),
             ListTile(
-              leading: const Icon(Icons.history, size: 28),
-              title: const Text('과거 작업 이력', style: TextStyle(fontSize: 18)),
+              leading: const Icon(Icons.history, size: 28, color: Color(0xFF0B1C30)),
+              title: const Text('과거 작업 이력', style: TextStyle(fontSize: 18, color: Color(0xFF0B1C30))),
               onTap: () => Navigator.pop(context),
             ),
-            const Divider(),
+            const Divider(color: Color(0xFFC2C6D4)),
             ListTile(
-              leading: const Icon(Icons.settings, size: 28),
-              title: const Text('앱 설정', style: TextStyle(fontSize: 18)),
+              leading: const Icon(Icons.settings, size: 28, color: Color(0xFF0B1C30)),
+              title: const Text('앱 설정', style: TextStyle(fontSize: 18, color: Color(0xFF0B1C30))),
               onTap: () => Navigator.pop(context),
             ),
           ],
@@ -206,11 +205,11 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF14B8A6), Color(0xFF2563EB)], 
+                  colors: [Color(0xFF005BB7), Color(0xFF00448C)], 
                 ),
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
-                  BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))
+                  BoxShadow(color: const Color(0xFF00448C).withOpacity(0.15), blurRadius: 20, offset: const Offset(0, 8))
                 ],
               ),
               child: _isLoadingWeather 
@@ -222,7 +221,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('$_weatherLocation', style: const TextStyle(color: Colors.white70, fontSize: 14, fontWeight: FontWeight.bold)),
+                            Text('$_weatherLocation', style: const TextStyle(color: Color(0xFFC4D7FF), fontSize: 14, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 4),
                             Text('현재 날씨: $_weatherTemp', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                             const SizedBox(height: 12),
@@ -230,7 +229,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                           ],
                         ),
                       ),
-                      Icon(_weatherIcon, color: Colors.yellowAccent, size: 64),
+                      Icon(_weatherIcon, color: const Color(0xFF7DD3FC), size: 64),
                     ],
                   ),
             ),
@@ -241,13 +240,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               children: [
                 const Text(
                   '배정된 현장 (2건)',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30)),
                 ),
                 TextButton(
                   onPressed: () {}, 
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
-                    child: Text('전체 보기', style: TextStyle(color: Color(0xFF14B8A6), fontSize: 16, fontWeight: FontWeight.bold)),
+                    child: Text('전체 보기', style: TextStyle(color: Color(0xFF005BB7), fontSize: 16, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],
@@ -282,15 +281,15 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: isUrgent ? Colors.red.withOpacity(0.08) : Colors.black.withOpacity(0.04),
+            color: isUrgent ? const Color(0xFFBA1A1A).withOpacity(0.08) : const Color(0xFF00448C).withOpacity(0.05),
             blurRadius: 20,
             offset: const Offset(0, 8),
           )
         ],
-        border: Border.all(color: isUrgent ? Colors.red.shade200 : Colors.transparent, width: 2),
+        border: Border.all(color: isUrgent ? const Color(0xFFFFDAD6) : Colors.transparent, width: 2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -301,34 +300,32 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isUrgent ? Colors.red.shade50 : Colors.teal.shade50,
-                  borderRadius: BorderRadius.circular(12),
+                  color: isUrgent ? const Color(0xFFFFDAD6) : const Color(0xFFE5EEFF),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
-                    color: isUrgent ? Colors.red.shade700 : Colors.teal.shade700,
+                    color: isUrgent ? const Color(0xFF93000A) : const Color(0xFF00448C),
                     fontWeight: FontWeight.bold,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
               ),
-              Text(time, style: TextStyle(color: isUrgent ? Colors.red.shade400 : Colors.grey.shade600, fontSize: 15, fontWeight: FontWeight.w900)),
+              Text(time, style: TextStyle(color: isUrgent ? const Color(0xFFBA1A1A) : const Color(0xFF424752), fontSize: 14, fontWeight: FontWeight.w700)),
             ],
           ),
           const SizedBox(height: 20),
-          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0F172A), height: 1.3)),
+          Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF0B1C30), height: 1.3)),
           const SizedBox(height: 28),
           
-          // 장갑 낀 상태를 고려하여 버튼 높이를 64px로 대폭 증가
           Row(
             children: [
               Expanded(
                 child: SizedBox(
-                  height: 64,
+                  height: 56,
                   child: OutlinedButton.icon(
                     onPressed: () async {
-                      // 카카오내비 앱링크 (Zero-Loading 예외 처리 방어 로직)
                       const double lat = 37.395;
                       const double lng = 127.111;
                       final Uri kakaoNaviUrl = Uri.parse('kakaonavi://navigate?ep=$lat,$lng&name=${Uri.encodeComponent(title)}');
@@ -337,15 +334,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                         if (await canLaunchUrl(kakaoNaviUrl)) {
                           await launchUrl(kakaoNaviUrl);
                         } else {
-                          // 앱 미설치 시 플레이스토어/앱스토어로 부드럽게 유도
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                               content: Text('카카오내비 앱이 설치되어 있지 않습니다.\n스토어 설치 화면으로 이동합니다.'),
-                              backgroundColor: Colors.orange,
+                              backgroundColor: Color(0xFF005BB7),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
-                          // 실제 상용화 시에는 마켓 URL로 리다이렉트
                           await Future.delayed(const Duration(seconds: 2));
                           final Uri storeUrl = Uri.parse('https://kakaonavi.kakao.com/launch/index.do');
                           launchUrl(storeUrl, mode: LaunchMode.externalApplication);
@@ -354,7 +349,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                          ScaffoldMessenger.of(context).showSnackBar(
                            const SnackBar(
                              content: Text('내비게이션 실행 중 오류가 발생했습니다.'),
-                             backgroundColor: Colors.red,
+                             backgroundColor: Color(0xFFBA1A1A),
                              behavior: SnackBarBehavior.floating,
                            ),
                          );
@@ -363,9 +358,9 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                     icon: const Icon(Icons.navigation, size: 24),
                     label: const Text('카카오내비', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF1E293B),
-                      side: const BorderSide(color: Color(0xFFCBD5E1), width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      foregroundColor: const Color(0xFF005BB7),
+                      side: const BorderSide(color: Color(0xFFC2C6D4), width: 1.5),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                 ),
@@ -374,7 +369,7 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
               Expanded(
                 flex: 1,
                 child: SizedBox(
-                  height: 64,
+                  height: 56,
                   child: ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
@@ -382,14 +377,13 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
                         MaterialPageRoute(builder: (context) => const ARCameraScreen()),
                       );
                     },
-                    icon: const Icon(Icons.view_in_ar, size: 28),
-                    label: const Text('AR 촬영', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    icon: const Icon(Icons.view_in_ar, size: 24),
+                    label: const Text('AR 촬영', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF14B8A6), 
+                      backgroundColor: const Color(0xFF00448C), 
                       foregroundColor: Colors.white,
-                      elevation: 4,
-                      shadowColor: const Color(0xFF14B8A6).withOpacity(0.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
                 ),
@@ -401,3 +395,4 @@ class _WorkerHomeScreenState extends State<WorkerHomeScreen> {
     );
   }
 }
+

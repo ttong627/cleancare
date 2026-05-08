@@ -4,6 +4,39 @@
 
 export type UserRole = 'MASTER' | 'ADMIN' | 'WORKER' | 'OFFICIAL';
 
+// 1. 거래처 및 담당자 스키마 (Clients)
+export interface ClientManager {
+  id: string;                  // 담당자 고유 ID
+  name: string;                // 담당자명
+  email: string;               // 담당자 이메일 (세금계산서 수신용 필수)
+  contact: string;             // 담당자 연락처
+  memo?: string;               // 비고
+}
+
+export interface Client {
+  id: string;                  // 거래처 문서 ID
+  businessNumber: string;      // 사업자등록번호
+  name: string;                // 거래처명
+  managers: ClientManager[];   // 거래처별 담당자 목록 (복수 가능)
+  createdAt: number;
+  updatedAt: number;
+}
+
+// 2. 세금계산서 발행 내역 (Invoices)
+export interface Invoice {
+  id: string;                  // 문서 ID
+  projectId?: string;          // 연관된 현장 프로젝트 ID (일괄/단건 연동 시)
+  clientId: string;            // 거래처 ID
+  clientName: string;          // 거래처명
+  businessNumber: string;      // 사업자등록번호
+  managerName: string;         // 수신 담당자명
+  managerEmail: string;        // 수신 담당자 이메일 (필수)
+  itemName: string;            // 품명 (기본값: 현장명)
+  amount: number;              // 공급가액
+  status: 'ISSUED' | 'FAILED' | 'PENDING';
+  issuedAt: number;            // 발행 일시
+}
+
 // 1. 사용자 (Users) 스키마
 export interface User {
   uid: string;                 // Firebase Auth UID

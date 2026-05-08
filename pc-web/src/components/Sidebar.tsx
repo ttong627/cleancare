@@ -20,17 +20,9 @@ export default function Sidebar() {
   return (
     <div className="w-64 bg-slate-900 border-r border-slate-800 h-screen fixed left-0 top-0 flex flex-col shadow-2xl">
       <div className="p-6 border-b border-slate-800 flex flex-col items-center justify-center">
-        {/* SVG + Text 기반 로고 (이미지 깨짐 방지 완벽 해결) */}
-        <div className="w-full h-14 bg-gradient-to-r from-teal-500 to-blue-500 rounded-xl p-0.5 mb-3 shadow-lg shadow-teal-500/20">
-          <div className="w-full h-full bg-slate-900 rounded-[10px] flex items-center justify-center gap-2">
-            <div className="bg-gradient-to-br from-teal-400 to-blue-500 text-transparent bg-clip-text font-black text-xl tracking-tight flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-teal-400">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                <path d="M9 12l2 2 4-4"/>
-              </svg>
-              크린케어
-            </div>
-          </div>
+        {/* 실제 로고 이미지 적용 (logo1.png) */}
+        <div className="w-full h-16 bg-white rounded-xl p-2 flex items-center justify-center mb-3 shadow-lg shadow-teal-500/10">
+          <img src="/logo1.png" alt="Clean Care Logo" className="w-full h-full object-contain" />
         </div>
         <p className="text-slate-500 text-xs font-medium">통합 관제 시스템 V3.0</p>
       </div>

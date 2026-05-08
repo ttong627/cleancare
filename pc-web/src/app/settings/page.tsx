@@ -1,12 +1,15 @@
 'use client';
 
-import { Shield, Key, Database, RefreshCcw, Smartphone, ToggleLeft, ToggleRight, CheckCircle2 } from 'lucide-react';
+import { Shield, Key, Database, RefreshCcw, Smartphone, ToggleLeft, ToggleRight, CheckCircle2, Download, Upload } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { collection, getDocs, setDoc, doc, writeBatch } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function SettingsPage() {
   const [rbacEnabled, setRbacEnabled] = useState(true);
   const [offlineSync, setOfflineSync] = useState(true);
+  const [isProcessingDB, setIsProcessingDB] = useState(false);
 
   const handleSave = () => {
     toast.promise(
@@ -21,6 +24,84 @@ export default function SettingsPage() {
 
   const handleTestConnection = () => {
     toast.success('Firebase Firestore 연결 및 권한 검증 완료!', { icon: '🟢' });
+  };
+
+  // DB 백업 (JSON 다운로드)
+  const handleBackupDB = async () => {
+    setIsProcessingDB(true);
+    const toastId = toast.loading('데이터베이스 백업을 생성하는 중...');
+    try {
+      const projectsSnap = await getDocs(collection(db, 'projects'));
+      const projectsData = projectsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      
+      const backupData = {
+        timestamp: new Date().toISOString(),
+        collections: {
+          projects: projectsData,
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `cleancare_db_backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      
+      toast.success(`총 ${projectsData.length}건의 데이터를 성공적으로 백업했습니다.`, { id: toastId });
+    } catch (error) {
+      console.error(error);
+      toast.error('데이터베이스 백업 실패', { id: toastId });
+    } finally {
+      setIsProcessingDB(false);
+    }
+  };
+
+  // DB 복원 (JSON 업로드)
+  const handleRestoreDB = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!confirm('경고: 현재 데이터베이스의 내용이 업로드한 백업 파일 내용으로 덮어쓰기 됩니다. 계속하시겠습니까?')) {
+      e.target.value = '';
+      return;
+    }
+
+    setIsProcessingDB(true);
+    const toastId = toast.loading('백업 파일을 클라우드로 복원하는 중...');
+    
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        const projects = json.collections?.projects;
+        
+        if (!projects || !Array.isArray(projects)) {
+          throw new Error('유효하지 않은 백업 파일 포맷입니다.');
+        }
+
+        // Firestore Batch write (한 번에 다수의 문서 쓰기)
+        const batch = writeBatch(db);
+        
+        // 기존 문서 삭제 로직은 보안상 생략하고, 덮어쓰기만 진행
+        projects.forEach((item: any) => {
+          const { id, ...data } = item;
+          const docRef = doc(db, 'projects', id);
+          batch.set(docRef, data);
+        });
+
+        await batch.commit();
+        toast.success(`총 ${projects.length}건의 데이터를 성공적으로 복원했습니다!`, { id: toastId });
+      } catch (error) {
+        console.error(error);
+        toast.error('DB 복원 실패: 파일이 손상되었거나 포맷이 다릅니다.', { id: toastId });
+      } finally {
+        setIsProcessingDB(false);
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
@@ -77,6 +158,27 @@ export default function SettingsPage() {
             >
               <RefreshCcw size={18} /> 전체 통신망 자가진단 테스트
             </button>
+
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <button 
+                onClick={handleBackupDB}
+                disabled={isProcessingDB}
+                className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded-xl transition-colors disabled:opacity-50"
+              >
+                <Download size={18} /> DB 수동 백업
+              </button>
+              
+              <label className="flex items-center justify-center gap-2 px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-600 rounded-xl transition-colors cursor-pointer disabled:opacity-50">
+                <Upload size={18} /> DB 복원 (JSON)
+                <input 
+                  type="file" 
+                  accept=".json" 
+                  className="hidden" 
+                  onChange={handleRestoreDB}
+                  disabled={isProcessingDB}
+                />
+              </label>
+            </div>
           </div>
         </section>
 

@@ -28,9 +28,10 @@ export function useProjects() {
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       try {
         if (snapshot.empty) {
-          // 데이터가 비어있으면 초기 시드 데이터 주입 (최초 1회)
-          await seedMockData();
-          return; // seedMockData가 완료되면 onSnapshot이 자동으로 다시 트리거됨
+          // DB가 비어있으면 데이터가 없는 상태 그대로 유지 (삭제한 내용이 부활하지 않도록 조치)
+          setProjects([]);
+          setIsLoading(false);
+          return;
         }
 
         const data = snapshot.docs.map(doc => ({

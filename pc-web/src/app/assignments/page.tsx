@@ -1,19 +1,30 @@
 'use client';
 
-import { useState } from 'react';
-import { Calendar as CalendarIcon, Map as MapIcon, Plus, MapPin, Navigation, User, Phone, Edit2, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Calendar as CalendarIcon, Map as MapIcon, Plus, MapPin, Navigation, User, Phone, Edit2, CheckCircle2, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
-
-// Mock Data for Assignments
-const initialAssignments = [
-  { id: 1, name: '광교중학교 에어컨 세척', date: '2026-05-10', worker: '김철수 팀장', status: '대기 중', lat: 37.282, lng: 127.043 },
-  { id: 2, name: '판교 테크원타워 로비 청소', date: '2026-05-10', worker: '이영희 매니저', status: '진행 중', lat: 37.395, lng: 127.111 },
-];
+import { collection, query, onSnapshot, doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function AssignmentsPage() {
   const [viewMode, setViewMode] = useState<'calendar' | 'map'>('calendar');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [assignments, setAssignments] = useState(initialAssignments);
+  const [assignments, setAssignments] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Firestore 실시간 구독 (새로고침 시 데이터 유지)
+  useEffect(() => {
+    const q = query(collection(db, 'assignments'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setAssignments(data);
+      setIsLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -26,11 +37,11 @@ export default function AssignmentsPage() {
     memo: ''
   });
 
-  const handleRegister = (e: React.FormEvent) => {
+  // DB에 새 일정 저장
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate Auto Geocoding
+    const newId = Date.now().toString();
     const newAssignment = {
-      id: Date.now(),
       name: formData.name,
       date: formData.date,
       worker: '미배정',
@@ -39,9 +50,28 @@ export default function AssignmentsPage() {
       lng: 127.0 + (Math.random() * 0.1 - 0.05),
     };
     
-    setAssignments([...assignments, newAssignment]);
-    setIsModalOpen(false);
-    toast.success('작업 현장이 성공적으로 등록되었습니다!\n주소가 카카오맵 좌표로 자동 변환되었습니다.');
+    try {
+      await setDoc(doc(db, 'assignments', newId), newAssignment);
+      setIsModalOpen(false);
+      toast.success('작업 현장이 DB에 안전하게 등록되었습니다!\n주소가 카카오맵 좌표로 자동 변환되었습니다.');
+      // 폼 초기화
+      setFormData({ ...formData, name: '', address: '', memo: '' });
+    } catch (error) {
+      toast.error('등록 실패');
+    }
+  };
+
+  // DB에서 일정 삭제
+  const handleDelete = async (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    if (confirm('이 작업 일정을 영구 삭제하시겠습니까? (복구 불가)')) {
+      try {
+        await deleteDoc(doc(db, 'assignments', id));
+        toast.success('DB에서 작업 일정이 완전히 삭제되었습니다.');
+      } catch (error) {
+        toast.error('삭제 실패');
+      }
+    }
   };
 
   return (
@@ -54,7 +84,8 @@ export default function AssignmentsPage() {
           </h1>
           <p className="text-slate-500">일자별 현장을 등록하고, 실시간 카카오 지도로 작업자의 위치를 관제합니다.</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 items-center">
+          {isLoading && <Loader2 className="animate-spin text-teal-600" size={24} />}
           <div className="bg-slate-100 p-1 rounded-xl flex">
             <button 
               onClick={() => setViewMode('calendar')}
@@ -117,8 +148,15 @@ export default function AssignmentsPage() {
                     </span>
                     <div className="mt-2 space-y-1">
                       {dayAssignments.map(job => (
-                        <div key={job.id} className="text-xs p-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md truncate font-medium cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow" title="드래그 앤 드롭으로 일정 변경 가능">
+                        <div key={job.id} className="group relative text-xs p-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-md truncate font-medium cursor-grab active:cursor-grabbing hover:shadow-md transition-all pr-6" title="드래그 앤 드롭으로 일정 변경 가능">
                           {job.name} ({job.worker})
+                          <button 
+                            onClick={(e) => handleDelete(e, job.id)}
+                            className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded opacity-0 group-hover:opacity-100 transition-all"
+                            title="일정 삭제"
+                          >
+                            ✕
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -131,14 +169,13 @@ export default function AssignmentsPage() {
           <div className="flex-1 relative bg-slate-100 flex items-center justify-center">
             {/* Kakao Map Placeholder */}
             <div className="absolute inset-0 z-0">
-              {/* In a real app, this would be <div id="map"> loaded via Kakao Maps JS API */}
               <div className="w-full h-full bg-[#E5E3DF] flex items-center justify-center relative overflow-hidden">
                 {/* Mock Map Background Grid */}
                 <div className="absolute inset-0 opacity-10 bg-[linear-gradient(#000_1px,transparent_1px),linear-gradient(90deg,#000_1px,transparent_1px)] bg-[size:40px_40px]"></div>
                 
                 {/* Map Markers */}
                 {assignments.map((job, idx) => (
-                  <div key={job.id} className="absolute flex flex-col items-center animate-bounce" style={{ left: `${40 + (idx * 20)}%`, top: `${30 + (idx * 20)}%` }}>
+                  <div key={job.id} className="absolute flex flex-col items-center animate-bounce" style={{ left: `${(40 + (idx * 15)) % 80}%`, top: `${(30 + (idx * 20)) % 80}%` }}>
                     <div className="bg-white p-3 rounded-2xl shadow-xl border-2 border-teal-500 mb-2 min-w-[150px] text-center z-10">
                       <p className="font-bold text-slate-800 text-sm truncate">{job.name}</p>
                       <p className="text-xs text-teal-600 font-bold mt-1">{job.worker}</p>

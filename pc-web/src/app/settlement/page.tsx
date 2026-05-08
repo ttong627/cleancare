@@ -1,20 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Receipt, CheckSquare, Square, Search, Filter, Send, Download } from 'lucide-react';
+import { Receipt, CheckSquare, Square, Search, Filter, Send, Download, Building2 } from 'lucide-react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ProjectData } from '@/hooks/useProjects';
 import toast from 'react-hot-toast';
 
+import ClientManagerModal from '@/components/ClientManagerModal';
+import InvoiceIssueModal from '@/components/InvoiceIssueModal';
+
 export default function SettlementPage() {
   const [completedProjects, setCompletedProjects] = useState<ProjectData[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
+  
+  // 모달 상태
+  const [isClientModalOpen, setIsClientModalOpen] = useState(false);
+  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
 
   useEffect(() => {
-    // 완료된(COMPLETED) 현장만 실시간으로 불러오기
+    // 완료된(COMPLETED) 현장 중 세금계산서 미발행건 위주로
     const q = query(collection(db, 'projects'), where('status', '==', 'COMPLETED'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => ({
@@ -25,7 +31,7 @@ export default function SettlementPage() {
       // 임의의 정산 금액(Price) 추가 로직 (실제로는 DB에 있어야 함)
       const dataWithPrice = data.map(item => ({
         ...item,
-        price: Math.floor(Math.random() * 5 + 3) * 100000 // 30만~80만 원 랜덤 배정
+        price: item.price || Math.floor(Math.random() * 5 + 3) * 100000 // 30만~80만 원 랜덤 배정
       }));
 
       setCompletedProjects(dataWithPrice);
@@ -36,14 +42,16 @@ export default function SettlementPage() {
   }, []);
 
   const toggleSelectAll = () => {
-    if (selectedIds.size === completedProjects.length) {
+    const unissuedProjects = completedProjects.filter(p => !p.invoiceIssued);
+    if (selectedIds.size === unissuedProjects.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(completedProjects.map(p => p.id)));
+      setSelectedIds(new Set(unissuedProjects.map(p => p.id)));
     }
   };
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (id: string, invoiceIssued: boolean) => {
+    if (invoiceIssued) return;
     const newSet = new Set(selectedIds);
     if (newSet.has(id)) {
       newSet.delete(id);
@@ -58,28 +66,16 @@ export default function SettlementPage() {
       toast.error('발행할 항목을 선택해주세요.');
       return;
     }
-
-    setIsProcessing(true);
-    toast.promise(
-      new Promise((resolve) => setTimeout(resolve, 2000)),
-      {
-        loading: `국세청 연동 중... (${selectedIds.size}건)`,
-        success: () => {
-          setSelectedIds(new Set());
-          setIsProcessing(false);
-          return <b>{selectedIds.size}건의 전자세금계산서 발행이 완료되었습니다!</b>;
-        },
-        error: () => {
-          setIsProcessing(false);
-          return <b>국세청 서버 응답 지연</b>;
-        },
-      }
-    );
+    setIsInvoiceModalOpen(true);
   };
 
   const totalAmount = completedProjects
     .filter(p => selectedIds.has(p.id))
     .reduce((sum, p) => sum + (p as ProjectData & { price: number }).price, 0);
+
+  const selectedProjectsData = completedProjects
+    .filter(p => selectedIds.has(p.id))
+    .map(p => ({ id: p.id, name: p.name, price: (p as any).price }));
 
   return (
     <div className="p-8 min-h-screen flex flex-col">
@@ -93,12 +89,15 @@ export default function SettlementPage() {
         </div>
         
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700 transition-colors">
-            <Download size={18} /> 엑셀 다운로드
+          <button 
+            onClick={() => setIsClientModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg border border-slate-700 transition-colors"
+          >
+            <Building2 size={18} /> 거래처 관리
           </button>
           <button 
             onClick={handleBulkIssue}
-            disabled={selectedIds.size === 0 || isProcessing}
+            disabled={selectedIds.size === 0}
             className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:hover:bg-emerald-600 text-white rounded-lg font-medium shadow-lg shadow-emerald-500/20 transition-colors"
           >
             <Send size={18} /> 선택 항목 일괄 발행 ({selectedIds.size}건)
@@ -190,6 +189,21 @@ export default function SettlementPage() {
           </tbody>
         </table>
       </div>
+
+      <ClientManagerModal 
+        isOpen={isClientModalOpen} 
+        onClose={() => setIsClientModalOpen(false)} 
+      />
+      
+      <InvoiceIssueModal 
+        isOpen={isInvoiceModalOpen} 
+        onClose={() => setIsInvoiceModalOpen(false)}
+        selectedProjects={selectedProjectsData}
+        onSuccess={() => {
+          setIsInvoiceModalOpen(false);
+          setSelectedIds(new Set());
+        }}
+      />
     </div>
   );
 }

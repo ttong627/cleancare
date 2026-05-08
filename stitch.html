@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Anti-Gravity Cleaning Service</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "primary-fixed": "#c6e7ff",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "surface-tint": "#003366",
+                    "primary-container": "#e1f5fe",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#d0e7ea",
+                    "secondary": "#4d6265",
+                    "surface-container-low": "#f0f7ff",
+                    "on-tertiary-container": "#37393a",
+                    "on-secondary-fixed-variant": "#364a4d",
+                    "outline": "#6e7881",
+                    "inverse-on-surface": "#f3f0f0",
+                    "surface-container": "#e8f4fd",
+                    "tertiary-container": "#a2a3a3",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-surface": "#1b1c1c",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f8",
+                    "surface-container-highest": "#e4e2e1",
+                    "outline-variant": "#bdc8d1",
+                    "surface-dim": "#dcd9d9",
+                    "surface-bright": "#fbf9f8",
+                    "on-surface-variant": "#3e4850",
+                    "on-primary-fixed": "#001e2d",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-primary-container": "#003366",
+                    "on-secondary-container": "#53686b",
+                    "surface": "#fbf9f8",
+                    "inverse-surface": "#303030",
+                    "error": "#ba1a1a",
+                    "on-background": "#1b1c1c",
+                    "surface-container-high": "#eae8e7",
+                    "secondary-fixed-dim": "#b4cbce",
+                    "surface-variant": "#e4e2e1",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#82cfff",
+                    "primary": "#003366",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-secondary-fixed": "#091f21",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#004c6b",
+                    "secondary-container": "#e1f5fe",
+                    "tertiary": "#5d5f5f",
+                    "primary-fixed-dim": "#82cfff",
+                    "brand-blue-deep": "#003366",
+                    "slate-dark": "#003366"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "lg": "48px",
+                    "xl": "80px",
+                    "2xl": "120px",
+                    "container-max": "1200px",
+                    "md": "24px",
+                    "xs": "4px",
+                    "gutter": "24px",
+                    "sm": "12px",
+                    "base": "8px"
+            },
+            "fontFamily": {
+                    "h2": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "h1": ["Inter"],
+                    "h3": ["Inter"],
+                    "caption": ["Inter"]
+            },
+            "fontSize": {
+                    "h2": ["36px", {"lineHeight": "1.25", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                    "h1": ["48px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "h3": ["24px", {"lineHeight": "1.3", "letterSpacing": "0", "fontWeight": "600"}],
+                    "caption": ["12px", {"lineHeight": "1.4", "letterSpacing": "0", "fontWeight": "400"}],
+                    "hero": ["64px", {"lineHeight": "1.1", "letterSpacing": "-0.03em", "fontWeight": "800"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .shadow-ambient-low {
+            box-shadow: 0 4px 12px rgba(51, 51, 51, 0.05);
+        }
+        .shadow-ambient-med {
+            box-shadow: 0 8px 20px rgba(51, 51, 51, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-50 shadow-sm bg-surface dark:bg-surface-dim bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-md">
+<div class="max-w-container-max mx-auto px-gutter h-20 flex items-center justify-between">
+<a class="flex items-center" href="#">
+<img alt="Anti-Gravity Logo" class="h-10 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpP3uhm5e_vNKfhRenMd7Z0jvd8EWsTxD6VyIvILWwkIrKMZnOjUvyQyxh7HesbvBFPY5xndILc7cQBdi-H7Qblz9AlwVg8HEimTKiOSktTxVFYRgmRU2x8XoBnWoqKhbaE1vvekt0kN6kE4RumEMssxD_FXtT64NCk5e68kvvNKj2C3OxyLsBCw4rO_76dYMWKUqYBqHK2zTlxVVyt3sATgCGvLGmsvUGtU9Gn-j2VGUpLzB0ZlUYqztx2B3FFjtYGbkbOuha-HRK"/>
+</a>
+<nav class="hidden md:flex gap-md">
+<a class="font-body-md text-body-md font-bold dark:text-gray-200 hover:text-primary transition-colors hover:bg-secondary-container/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg py-xs px-sm transition-all text-primary" href="#">Services</a>
+<a class="font-body-md text-body-md font-bold dark:text-gray-200 hover:text-primary transition-colors hover:bg-secondary-container/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg py-xs px-sm transition-all text-primary" href="#">Booking</a>
+<a class="font-body-md text-body-md font-bold dark:text-gray-200 hover:text-primary transition-colors hover:bg-secondary-container/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg py-xs px-sm transition-all text-primary" href="#">Reviews</a>
+<a class="font-body-md text-body-md font-bold dark:text-gray-200 hover:text-primary transition-colors hover:bg-secondary-container/20 dark:hover:bg-secondary-fixed-dim/10 rounded-lg py-xs px-sm transition-all text-primary" href="#">About</a>
+</nav>
+<div class="flex items-center gap-sm">
+<a class="hidden sm:block font-label-md text-label-md font-bold hover:text-primary transition-colors px-md py-sm text-primary" href="#">Login</a>
+<a class="bg-brand-blue-deep text-white font-label-md text-label-md px-md py-sm rounded-lg hover:bg-primary shadow-ambient-low hover:shadow-ambient-med transition-all" href="#">Quick Booking</a>
+</div>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="relative w-full overflow-hidden bg-surface-container-lowest">
+<div class="absolute inset-0 z-0">
+<img alt="Bright clean living room" class="w-full h-full object-cover opacity-90" data-alt="A bright, modern living room bathed in natural sunlight, representing the ultimate refreshing clean. The space is minimalist and airy, featuring pristine white furniture, light wood floors, and subtle sky-blue accent pillows. The lighting is high-key and soft, creating a calm, trustworthy atmosphere. The overall style embodies corporate modern minimalism, perfectly reflecting the brand's 'Airy Professionalism' aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTNHuTj0DVT4IPL57Ih7OmSmU26MqVPeYqOuy1OGI5Le7Y8Af2gY1XF2wzPTyFDCpR0rpID6S6RHpx0nRsrmwhboW3gg3Dnn-OytVqhS_ECxNWUGJK5_S7CPcFN7zDiETseZrWnxMQTbpig_AspD1jiGu4YJmTHFl67vXnaGYTK2rsbWtVuBHTU6pcZNtytLM1YHl0kxS7RlNjwVx1ptlMvDmQRP0Kk5ijcuFe2pZveZ5LdtIroVVYqLeNbzKeVw4N9BeOqd1A5fQ3"/>
+<div class="absolute inset-0 bg-gradient-to-r from-surface/95 via-surface/80 to-transparent"></div>
+</div>
+<div class="relative z-10 max-w-container-max mx-auto px-gutter pt-xl pb-xl md:pt-32 md:pb-32 flex flex-col items-start justify-center min-h-[716px]">
+<div class="max-w-2xl">
+<span class="inline-block bg-secondary-container text-primary font-label-md text-label-md px-sm py-xs rounded-full mb-md shadow-ambient-low">Weightless Professionalism</span>
+<h1 class="text-hero text-slate-dark mb-md">Weightless Clean, Gravity-Defying Results.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-lg max-w-xl">Experience an innovative, weightless clean for your home and office. Trust our reliable professionals to elevate your space to pristine condition.</p>
+<div class="flex flex-wrap gap-md">
+<a class="bg-brand-blue-deep text-white font-label-md text-label-md px-lg py-sm rounded-lg shadow-ambient-low hover:shadow-ambient-med hover:-translate-y-0.5 transition-all flex items-center gap-base" href="#">
+                        Book a Clean Now
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</a>
+<a class="bg-surface-container-low text-primary font-label-md text-label-md px-lg py-sm rounded-lg border border-outline-variant hover:border-primary hover:bg-surface transition-all flex items-center gap-base" href="#">
+                        View Services
+                    </a>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Section (Floating) -->
+<section class="max-w-container-max mx-auto px-gutter relative z-20 -mt-lg mb-2xl">
+<div class="bg-surface rounded-xl shadow-ambient-med p-lg grid grid-cols-1 md:grid-cols-3 gap-md divide-y md:divide-y-0 md:divide-x divide-outline-variant/30">
+<div class="flex flex-col items-center justify-center text-center p-sm">
+<span class="font-h2 text-h2 text-primary mb-xs">5,000+</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Happy Customers</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center p-sm">
+<span class="font-h2 text-h2 text-primary mb-xs">10+</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Years Experience</span>
+</div>
+<div class="flex flex-col items-center justify-center text-center p-sm">
+<span class="font-h2 text-h2 text-primary mb-xs">100%</span>
+<span class="font-body-md text-body-md text-on-surface-variant">Satisfaction Guarantee</span>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-2xl max-w-container-max mx-auto px-gutter">
+<div class="text-center mb-lg">
+<h2 class="font-h2 text-h2 text-slate-dark mb-sm">Why Choose Anti-Gravity?</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">We combine top-tier professionalism with an airy, minimalist approach to bring you peace of mind.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="flex flex-col items-center text-center bg-surface-container-low rounded-xl p-lg shadow-ambient-low hover:shadow-ambient-med transition-all">
+<div class="w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined text-[32px] icon-fill">eco</span>
+</div>
+<h3 class="font-h3 text-h3 text-slate-dark mb-sm">Eco-Friendly Products</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Safe for your family, pets, and the environment without compromising on cleaning power.</p>
+</div>
+<div class="flex flex-col items-center text-center bg-surface-container-low rounded-xl p-lg shadow-ambient-low hover:shadow-ambient-med transition-all">
+<div class="w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined text-[32px] icon-fill">group</span>
+</div>
+<h3 class="font-h3 text-h3 text-slate-dark mb-sm">Professional Team</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Vetted, highly trained, and dedicated experts who respect your space and privacy.</p>
+</div>
+<div class="flex flex-col items-center text-center bg-surface-container-low rounded-xl p-lg shadow-ambient-low hover:shadow-ambient-med transition-all">
+<div class="w-16 h-16 bg-secondary-container rounded-full flex items-center justify-center text-primary mb-md">
+<span class="material-symbols-outlined text-[32px] icon-fill">verified</span>
+</div>
+<h3 class="font-h3 text-h3 text-slate-dark mb-sm">100% Satisfaction</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">If you're not completely satisfied with our service, we'll return to make it right.</p>
+</div>
+</div>
+</section>
+<!-- Services Section -->
+<section class="py-2xl bg-surface-container">
+<div class="max-w-container-max mx-auto px-gutter">
+<div class="flex flex-col md:flex-row justify-between items-end mb-lg">
+<div class="max-w-xl">
+<h2 class="font-h2 text-h2 text-slate-dark mb-sm">Our Core Services</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Tailored cleaning solutions designed to elevate your environment.</p>
+</div>
+<a class="hidden md:flex items-center gap-xs font-label-md text-label-md text-primary hover:text-primary-container transition-colors" href="#">
+                    Explore all services
+                    <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md">
+<!-- Service Card 1 -->
+<div class="group relative bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-med transition-all cursor-pointer border border-outline-variant/20">
+<div class="h-48 overflow-hidden">
+<img alt="Residential Cleaning" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A meticulously clean residential living space, showcasing a freshly vacuumed light-colored rug, perfectly arranged minimalist furniture, and a sunlit atmosphere. The color palette emphasizes whites, soft grays, and natural wood tones, reflecting the brand's 'Airy Professionalism'. The image conveys a sense of calm, order, and immediate relief upon entering a clean home." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMv9iqHLll60z-jgE3a6yP8RdLO6KHbi5R-DNunBBt_jFsyIWE-iWjMRzD_452Orrf-7qlCKA7oLgsXKKGM-i3ygpul0kbKfy_CX6bl3lC9-REAYwzDaNw4s5RqdpHxGhX6uha6un7IdRg3BW9ebug7Wvm2yTM_X3B9WMUnWR4JsYnte7VjVxoLYqGSJ0Ms8zQWBwGDU3Cg9LHX9IM7dcEzvhBUyWO-jBKjMuj9bYxWFa3blvulySPEUWfDBje_7ZsElrvU2ETe9X-"/>
+</div>
+<div class="p-md">
+<h3 class="font-h3 text-h3 text-slate-dark mb-xs">Residential Cleaning</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Comprehensive home cleaning to keep your personal sanctuary spotless and serene.</p>
+<span class="inline-flex items-center gap-xs font-label-md text-label-md text-primary group-hover:text-primary-container transition-colors">
+                            Book Service <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</div>
+<!-- Service Card 2 -->
+<div class="group relative bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-med transition-all cursor-pointer border border-outline-variant/20">
+<div class="h-48 overflow-hidden">
+<img alt="Commercial Cleaning" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern, spacious corporate office interior after a professional cleaning. The scene features sleek desks, ergonomic chairs, and large windows letting in abundant natural light. The surfaces are gleaming, and the overall aesthetic is minimalist, structured, and highly professional. The dominant colors are cool whites, slate grays, and subtle sky-blue accents, aligning with the brand's trustworthy and efficient identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbChSvXRboP3MFWRxArhA3-8GgLU7xaS83nclJeUtgdiBL48EDkNrW6fIVDbBYdrf6RPkwLC_ppGmYpxzpG8zyRJadiDcsmETOaAKzrWA9PHQ65P6z7usmNgOzLOwaBHF3D6hToZ9lOuLz5ltCNwIiZxZIyImXByKhUuWCrjuIAsYorM9ZAcsZ5zB6pHwivQxwYaueaToh-EmZZQUVHobLGPtPejTjY39A9vxPG0WxN1Dg2qNa1NBRVacyzuWqmTEuPsVb8_ex-XZy"/>
+</div>
+<div class="p-md">
+<h3 class="font-h3 text-h3 text-slate-dark mb-xs">Commercial Cleaning</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Professional office cleaning services to maintain a healthy, productive workspace.</p>
+<span class="inline-flex items-center gap-xs font-label-md text-label-md text-primary group-hover:text-primary-container transition-colors">
+                            Book Service <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</div>
+<!-- Service Card 3 -->
+<div class="group relative bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-med transition-all cursor-pointer border border-outline-variant/20">
+<div class="h-48 overflow-hidden">
+<img alt="Move-in Cleaning" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="An empty, freshly cleaned residential room prepared for new occupants. The space features pristine, bare walls, sparkling clean hardwood floors, and sunlight streaming through an uncovered window. The image evokes a sense of a 'fresh start' and deep cleanliness. The style is bright, airy, and minimalist, utilizing high-key lighting to emphasize the spotless nature of the environment." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcbfkZo_Bj5wPZHZdTW4ASJSKwff0hKUV2g3RPJl0hIp6KL_pb3mcjMpn1e2LsYIq5ZbKmXwq5zkENLtfNmWlw1-yWK75G1VjGeFn5sm5NW1NNOTJ8n7QzVfS0x6aIg3O-Xq-T5PpsImkFr3YC4D1TuSDwMpGNdwOnxWZwWLZOCoOY2jhNKngvr8D2Fp3Ey1Dw-nLEnA1U7oFNkWADWzPsv6DHj5mHTy33o96igg-nDFZavJO_HhTmox6giNKP74Weyi0xNkxX7iGy"/>
+</div>
+<div class="p-md">
+<h3 class="font-h3 text-h3 text-slate-dark mb-xs">Move-in Cleaning</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-md">Deep cleaning for empty spaces, ensuring a fresh start in your new home.</p>
+<span class="inline-flex items-center gap-xs font-label-md text-label-md text-primary group-hover:text-primary-container transition-colors">
+                            Book Service <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-xl dark:bg-surface-container-lowest border-t border-outline-variant/30 bg-surface-container">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-4 gap-lg">
+<div class="col-span-1 md:col-span-1 flex flex-col gap-sm">
+<img alt="Anti-Gravity Logo" class="h-10 w-auto object-contain mb-2" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpP3uhm5e_vNKfhRenMd7Z0jvd8EWsTxD6VyIvILWwkIrKMZnOjUvyQyxh7HesbvBFPY5xndILc7cQBdi-H7Qblz9AlwVg8HEimTKiOSktTxVFYRgmRU2x8XoBnWoqKhbaE1vvekt0kN6kE4RumEMssxD_FXtT64NCk5e68kvvNKj2C3OxyLsBCw4rO_76dYMWKUqYBqHK2zTlxVVyt3sATgCGvLGmsvUGtU9Gn-j2VGUpLzB0ZlUYqztx2B3FFjtYGbkbOuha-HRK"/>
+<p class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant mt-sm">Weightless Professionalism. We bring innovative relief and satisfaction to your space.</p>
+</div>
+<div class="col-span-1 md:col-span-3 grid grid-cols-2 md:grid-cols-3 gap-lg">
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-on-surface font-bold mb-xs">Company</h4>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">About Us</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Careers</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Contact Us</a>
+</div>
+<div class="flex flex-col gap-sm">
+<h4 class="font-label-md text-label-md text-on-surface font-bold mb-xs">Support</h4>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">FAQ</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Booking Guide</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-sm col-span-2 md:col-span-1">
+<h4 class="font-label-md text-label-md text-on-surface font-bold mb-xs">Legal</h4>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors opacity-80 hover:opacity-100" href="#">Cookie Policy</a>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter mt-lg pt-lg border-t border-outline-variant/20 flex flex-col md:flex-row justify-between items-center gap-sm">
+<p class="font-caption text-caption text-on-surface-variant dark:text-outline-variant">© 2024 Anti-Gravity Cleaning Services. All rights reserved.</p>
+<div class="flex gap-md">
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">language</span></a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[20px]">share</span></a>
+</div>
+</div>
+</footer>
+</body></html>

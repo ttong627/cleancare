@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ],
                     ),
                     child: Image.asset(
-                      'assets/images/logo-en-v.png',
+                      'assets/images/logo1.png',
                       height: 100,
                       errorBuilder: (context, error, stackTrace) => 
                         const Icon(Icons.cleaning_services_rounded, size: 80, color: Color(0xFF14B8A6)),
