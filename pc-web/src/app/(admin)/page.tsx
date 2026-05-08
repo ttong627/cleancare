@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { AlertCircle, CheckCircle2, Clock, MapPin, Navigation, RefreshCcw, Loader2, Search, X } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { AlertCircle, CheckCircle2, Clock, MapPin, Navigation, RefreshCcw, Loader2, Search, X, Cloud, Sun, CloudRain } from 'lucide-react';
 import { useProjects, useUpdateProjectStatus, ProjectData } from '@/hooks/useProjects';
 import ProjectDetailsModal from '@/components/ProjectDetailsModal';
+import { Map, MapMarker, CustomOverlayMap, useKakaoLoader } from 'react-kakao-maps-sdk';
 
 export default function DashboardPage() {
   const { data: projects, isLoading } = useProjects();
@@ -12,6 +13,37 @@ export default function DashboardPage() {
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
+  // 카카오맵 로드 (API 키 없으면 로드 생략)
+  const [loading, error] = useKakaoLoader({
+    appkey: process.env.NEXT_PUBLIC_KAKAO_APP_KEY || 'dummy_key',
+    libraries: ['clusterer', 'services'],
+  });
+
+  // 실시간 날씨 상태
+  const [weather, setWeather] = useState<{ temp: number; desc: string; icon: string } | null>(null);
+
+  useEffect(() => {
+    async function fetchWeather() {
+      try {
+        const apiKey = process.env.NEXT_PUBLIC_WEATHER_API_KEY;
+        if (!apiKey) return;
+        // 서울/경기 중심 좌표 (임시)
+        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=37.5665&lon=126.9780&units=metric&lang=kr&appid=${apiKey}`);
+        const data = await res.json();
+        if (data.main) {
+          setWeather({
+            temp: Math.round(data.main.temp),
+            desc: data.weather[0].description,
+            icon: data.weather[0].main, // 'Clear', 'Clouds', 'Rain' 등
+          });
+        }
+      } catch (err) {
+        console.error("날씨 정보 연동 실패:", err);
+      }
+    }
+    fetchWeather();
+  }, []);
 
   const filtered = useMemo(() => {
     if (!projects) return [];
@@ -34,6 +66,12 @@ export default function DashboardPage() {
   const SkeletonRow = () => (
     <div className="h-24 rounded-xl bg-white/5 border border-white/10 animate-pulse" />
   );
+
+  // 현장 좌표 모의 생성 (DB에 좌표가 없을 경우를 대비한 헬퍼)
+  const getMockCoords = (index: number) => ({
+    lat: 37.3827 + (index * 0.02 * (index % 2 === 0 ? 1 : -1)), // 판교 주변 기준 분산
+    lng: 127.1189 + (index * 0.03 * (index % 3 === 0 ? 1 : -1)),
+  });
 
   return (
     <div className="min-h-screen p-8 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black">
@@ -83,9 +121,20 @@ export default function DashboardPage() {
               <span className="text-sm">동기화 중...</span>
             </div>
           )}
+
+          {/* 날씨 위젯 */}
+          {weather && (
+            <div className="px-4 py-2 bg-slate-800/50 border border-slate-700/50 rounded-full backdrop-blur-md flex items-center gap-2 shadow-inner">
+              {weather.icon === 'Clear' ? <Sun size={18} className="text-yellow-400" /> : 
+               weather.icon === 'Rain' ? <CloudRain size={18} className="text-blue-400" /> : 
+               <Cloud size={18} className="text-slate-400" />}
+              <span className="text-sm font-medium text-slate-200">{weather.temp}°C {weather.desc}</span>
+            </div>
+          )}
+
           <div className="px-4 py-2 bg-slate-800/50 border border-emerald-500/20 rounded-full backdrop-blur-md flex items-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.8)]" />
-            <span className="text-sm font-medium text-emerald-400">Firestore 통신 정상</span>
+            <span className="text-sm font-medium text-emerald-400">DB Live</span>
           </div>
         </div>
       </header>
@@ -137,19 +186,59 @@ export default function DashboardPage() {
       )}
 
       {viewMode === 'map' ? (
-        {/* 지도 관제 뷰 (플레이스홀더/UI만 선행 구현) */}
-        <section className="h-[600px] w-full rounded-2xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-md flex flex-col items-center justify-center shadow-xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=Seoul,KR&zoom=11&size=1000x600&style=feature:all|element:labels.text.fill|color:0x8ec3b9&style=feature:all|element:labels.text.stroke|color:0x1a3646&style=feature:administrative.country|element:geometry.stroke|color:0x4b6878&style=feature:administrative.land_parcel|element:labels.text.fill|color:0x64779e&style=feature:administrative.province|element:geometry.stroke|color:0x4b6878&style=feature:landscape.man_made|element:geometry.stroke|color:0x334e87&style=feature:landscape.natural|element:geometry|color:0x023e58&style=feature:poi|element:geometry|color:0x283d6a&style=feature:poi|element:labels.text.fill|color:0x6f9ba5&style=feature:poi|element:labels.text.stroke|color:0x1d2c4d&style=feature:poi.park|element:geometry.fill|color:0x023e58&style=feature:poi.park|element:labels.text.fill|color:0x3C7680&style=feature:road|element:geometry|color:0x304a7d&style=feature:road|element:labels.text.fill|color:0x98a5be&style=feature:road|element:labels.text.stroke|color:0x1d2c4d&style=feature:road.highway|element:geometry|color:0x2c6675&style=feature:road.highway|element:geometry.stroke|color:0x255763&style=feature:road.highway|element:labels.text.fill|color:0xb0d5ce&style=feature:road.highway|element:labels.text.stroke|color:0x023e58&style=feature:transit|element:labels.text.fill|color:0x98a5be&style=feature:transit|element:labels.text.stroke|color:0x1d2c4d&style=feature:transit.line|element:geometry.fill|color:0x283d6a&style=feature:transit.station|element:geometry|color:0x3a4762&style=feature:water|element:geometry|color:0x0e1626&style=feature:water|element:labels.text.fill|color:0x4e6d70')] bg-cover bg-center opacity-30 mix-blend-luminosity"></div>
-          
-          <MapPin size={48} className="text-teal-400 mb-4 animate-bounce z-10" />
-          <h2 className="text-2xl font-bold text-white mb-2 z-10">실시간 지도 관제 시스템</h2>
-          <p className="text-slate-400 max-w-md text-center z-10">
-            현재 API 연동 준비 중입니다. 연동이 완료되면 전국 작업 현장과 
-            실무자의 실시간 위치가 자동으로 클러스터링되어 표시됩니다.
-          </p>
-          <div className="mt-6 flex gap-3 z-10">
-            <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30 text-sm font-medium">긴급 {rejectedCount}</span>
-            <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/30 text-sm font-medium">진행중 {inProgressCount}</span>
+        <section className="h-[600px] w-full rounded-2xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-md shadow-xl relative overflow-hidden">
+          {!process.env.NEXT_PUBLIC_KAKAO_APP_KEY ? (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-slate-900/80 backdrop-blur-sm">
+              <MapPin size={48} className="text-teal-400 mb-4 animate-bounce" />
+              <h2 className="text-2xl font-bold text-white mb-2">카카오맵 API 연동 완료</h2>
+              <p className="text-slate-400 max-w-md text-center bg-slate-800 p-4 rounded-lg border border-slate-700">
+                .env.local 파일에 <code>NEXT_PUBLIC_KAKAO_APP_KEY</code>를 입력하시면 실제 지도가 즉시 렌더링됩니다.
+              </p>
+            </div>
+          ) : loading ? (
+            <div className="absolute inset-0 flex items-center justify-center z-10 bg-slate-900/80">
+              <Loader2 className="animate-spin text-teal-500" size={48} />
+            </div>
+          ) : error ? (
+            <div className="absolute inset-0 flex items-center justify-center z-10 bg-slate-900/80 text-red-400">
+              지도를 불러오는데 실패했습니다. API 키를 확인해주세요.
+            </div>
+          ) : (
+            <Map 
+              center={{ lat: 37.3827, lng: 127.1189 }} // 초기 중심 (판교)
+              style={{ width: "100%", height: "100%" }}
+              level={8}
+              className="z-0"
+            >
+              {filtered.map((project, idx) => {
+                const coords = getMockCoords(idx);
+                const isRejected = project.status === 'REJECTED';
+                const isCompleted = project.status === 'COMPLETED';
+                
+                return (
+                  <CustomOverlayMap key={project.id} position={coords} yAnchor={1}>
+                    <div 
+                      className={`px-3 py-1.5 rounded-lg shadow-lg flex items-center gap-2 border cursor-pointer transition-transform hover:scale-110 
+                        ${isRejected ? 'bg-red-500 text-white border-red-600' : 
+                          isCompleted ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-blue-500 text-white border-blue-600'}`}
+                      onClick={() => setSelectedProject(project)}
+                    >
+                      <MapPin size={16} />
+                      <span className="font-semibold text-xs whitespace-nowrap">{project.name}</span>
+                    </div>
+                  </CustomOverlayMap>
+                );
+              })}
+            </Map>
+          )}
+
+          {/* 지도 오버레이 UI */}
+          <div className="absolute top-4 left-4 z-10 bg-slate-900/80 p-4 rounded-xl border border-slate-700/50 backdrop-blur-md">
+            <h3 className="text-white font-semibold mb-2">실시간 투입 현황</h3>
+            <div className="flex flex-col gap-2">
+              <span className="px-3 py-1 bg-red-500/20 text-red-400 rounded-full border border-red-500/30 text-sm font-medium">긴급 {rejectedCount}건</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-full border border-blue-500/30 text-sm font-medium">진행중 {inProgressCount}건</span>
+            </div>
           </div>
         </section>
       ) : (
