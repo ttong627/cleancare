@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { UserCog, UserPlus, Trash2, Shield, Briefcase, Users, Search, X, Save, Loader2, Mail, Phone } from 'lucide-react';
+import { UserCog, UserPlus, Trash2, Shield, Briefcase, Users, Search, X, Save, Loader2, Mail, Phone, Edit } from 'lucide-react';
 import { collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import { sendEmail, approvalEmailHtml } from '@/lib/email';
 import toast from 'react-hot-toast';
 
-type UserRole = 'MASTER' | 'ADMIN' | 'WORKER';
+type UserRole = 'MASTER' | 'ADMIN' | 'WORKER' | 'PENDING';
 
 interface SystemUser {
   id: string;
@@ -37,12 +38,19 @@ const ROLE_CONFIG: Record<UserRole, { label: string; description: string; badge:
     badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
     icon: <Users size={12} />,
   },
+  PENDING: {
+    label: '가입대기',
+    description: '관리자 승인 대기중',
+    badge: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+    icon: <UserCog size={12} />,
+  },
 };
 
 const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
   MASTER: ['모든 데이터 조회/수정/삭제', '사용자 권한 관리', '시스템 설정 변경', '세금계산서 발행·취소', 'DB 백업 및 복원'],
   ADMIN: ['전체 현장 조회', '정산 등록 및 계산서 발행', '작업자·거래처 관리', '팩스 전송', '보고서 출력'],
   WORKER: ['본인 배정 현장만 조회', '완료 보고 및 사진 업로드', 'GPS 위치 실시간 공유', '반려 요청 전송'],
+  PENDING: ['접근 권한 없음'],
 };
 
 const EMPTY_FORM = { name: '', email: '', phone: '', role: 'WORKER' as UserRole };
@@ -55,6 +63,7 @@ export default function UsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   useEffect(() => {
     const q = query(collection(db, 'systemUsers'));
@@ -77,19 +86,30 @@ export default function UsersPage() {
     }
     setIsSaving(true);
     try {
-      await addDoc(collection(db, 'systemUsers'), {
-        name: form.name.trim(),
-        email: form.email.trim(),
-        phone: form.phone.trim(),
-        role: form.role,
-        isActive: true,
-        createdAt: Date.now(),
-      });
-      toast.success(`${form.name} 사용자가 등록되었습니다.`);
+      if (editingId) {
+        await updateDoc(doc(db, 'systemUsers', editingId), {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          role: form.role,
+        });
+        toast.success(`${form.name} 사용자 정보가 수정되었습니다.`);
+      } else {
+        await addDoc(collection(db, 'systemUsers'), {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          phone: form.phone.trim(),
+          role: form.role,
+          isActive: true,
+          createdAt: Date.now(),
+        });
+        toast.success(`${form.name} 사용자가 등록되었습니다.`);
+      }
       setForm(EMPTY_FORM);
+      setEditingId(null);
       setIsModalOpen(false);
     } catch {
-      toast.error('등록에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -119,6 +139,20 @@ export default function UsersPage() {
     try {
       await updateDoc(doc(db, 'systemUsers', user.id), { role: newRole });
       toast.success(`${user.name}의 권한이 ${ROLE_CONFIG[newRole].label}로 변경되었습니다.`);
+
+      // PENDING → 활성 권한 승인 시 이메일 발송
+      if (user.role === 'PENDING' && newRole !== 'PENDING' && user.email) {
+        try {
+          await sendEmail({
+            to: user.email,
+            subject: '[크린케어] 계정 승인이 완료되었습니다',
+            html: approvalEmailHtml(user.name, newRole),
+          });
+          toast.success(`${user.name}에게 승인 안내 메일을 발송했습니다.`);
+        } catch (emailErr) {
+          console.warn('승인 이메일 전송 실패:', emailErr);
+        }
+      }
     } catch {
       toast.error('권한 변경 실패');
     }
@@ -223,7 +257,7 @@ export default function UsersPage() {
               <th className="p-4 text-slate-300 font-semibold">현재 권한</th>
               <th className="p-4 text-slate-300 font-semibold">권한 변경</th>
               <th className="p-4 text-slate-300 font-semibold">계정 상태</th>
-              <th className="p-4 text-slate-300 font-semibold text-center">삭제</th>
+              <th className="p-4 text-slate-300 font-semibold text-center">관리 (수정/삭제)</th>
             </tr>
           </thead>
           <tbody>
@@ -279,6 +313,7 @@ export default function UsersPage() {
                       <option value="MASTER">관리자</option>
                       <option value="ADMIN">사무실무자</option>
                       <option value="WORKER">현장작업자</option>
+                      <option value="PENDING">대기중</option>
                     </select>
                   </td>
                   <td className="p-4">
@@ -294,12 +329,26 @@ export default function UsersPage() {
                     </button>
                   </td>
                   <td className="p-4 text-center">
-                    <button
-                      onClick={() => handleDelete(user)}
-                      className="text-slate-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-red-400/10"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => {
+                          setForm({ name: user.name, email: user.email, phone: user.phone || '', role: user.role });
+                          setEditingId(user.id);
+                          setIsModalOpen(true);
+                        }}
+                        className="text-slate-500 hover:text-blue-400 p-1.5 rounded-lg hover:bg-blue-400/10 transition-colors"
+                        title="사용자 정보 수정"
+                      >
+                        <Edit size={16} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user)}
+                        className="text-slate-500 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-400/10 transition-colors"
+                        title="사용자 삭제"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

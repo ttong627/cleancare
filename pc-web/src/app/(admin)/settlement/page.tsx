@@ -3,9 +3,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
   Receipt, CheckSquare, Square, Search, Send, Building2, X,
-  Trash2, PencilLine, FileText, Clock, ChevronRight, Loader2
+  Trash2, PencilLine, FileText, Clock, ChevronRight, Loader2,
+  CreditCard, Printer, BookText, BadgeCheck, AlertCircle, BarChart2
 } from 'lucide-react';
-import { collection, query, where, onSnapshot, orderBy, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+import MonthlyChart from '@/components/MonthlyChart';
+import { collection, query, where, onSnapshot, orderBy, updateDoc, doc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ProjectData } from '@/hooks/useProjects';
 import { Invoice } from '@/schema';
@@ -13,8 +15,11 @@ import toast from 'react-hot-toast';
 
 import ClientManagerModal from '@/components/ClientManagerModal';
 import InvoiceIssueModal from '@/components/InvoiceIssueModal';
+import PaymentModal from '@/components/PaymentModal';
+import PrintDocModal from '@/components/PrintDocModal';
 
-type Tab = 'PENDING' | 'ISSUED';
+type Tab = 'PENDING' | 'ISSUED' | 'CHART';
+type PrintType = 'receipt' | 'statement';
 
 export default function SettlementPage() {
   const [activeTab, setActiveTab] = useState<Tab>('PENDING');
@@ -33,6 +38,8 @@ export default function SettlementPage() {
   // 모달 state
   const [isClientModalOpen, setIsClientModalOpen] = useState(false);
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
+  const [paymentModal, setPaymentModal] = useState<Invoice | null>(null);
+  const [printModal, setPrintModal] = useState<{ invoice: Invoice; type: PrintType } | null>(null);
 
   // 금액 등록 모달 state
   const [priceModal, setPriceModal] = useState<{ project: ProjectData; value: string } | null>(null);
@@ -48,14 +55,29 @@ export default function SettlementPage() {
     return () => unsubscribe();
   }, []);
 
-  // 발행된 계산서 실시간 구독
+  // 발행된 계산서 실시간 구독 (인덱스 오류 시 정렬 없이 폴백)
   useEffect(() => {
-    const q = query(collection(db, 'invoices'), orderBy('issuedAt', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setInvoices(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)));
+    let unsubscribe: () => void;
+    try {
+      const q = query(collection(db, 'invoices'), orderBy('issuedAt', 'desc'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        setInvoices(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Invoice)));
+        setIsLoadingInvoices(false);
+      }, (err) => {
+        console.warn('인덱스 없이 폴백:', err.message);
+        // 인덱스 오류 시 정렬 없이 재구독
+        const fallbackQ = query(collection(db, 'invoices'));
+        unsubscribe = onSnapshot(fallbackQ, (snapshot) => {
+          const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Invoice));
+          data.sort((a, b) => (b.issuedAt || 0) - (a.issuedAt || 0));
+          setInvoices(data);
+          setIsLoadingInvoices(false);
+        });
+      });
+    } catch {
       setIsLoadingInvoices(false);
-    }, () => setIsLoadingInvoices(false));
-    return () => unsubscribe();
+    }
+    return () => unsubscribe?.();
   }, []);
 
   // 발행 대기 목록 (미발행만)
@@ -213,6 +235,15 @@ export default function SettlementPage() {
             </span>
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('CHART')}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold transition-all ${
+            activeTab === 'CHART' ? 'bg-slate-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <BarChart2 size={16} />
+          월별 분석 차트
+        </button>
       </div>
 
       {/* ── 발행 대기 탭 ── */}
@@ -294,6 +325,13 @@ export default function SettlementPage() {
                           <PencilLine size={13} /> 정산 등록
                         </button>
                         <button
+                          onClick={() => window.location.href = `/fax?docName=${encodeURIComponent(project.name + ' 정산서')}`}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 border border-slate-700 hover:bg-teal-600/20 hover:text-teal-400 hover:border-teal-500/50 text-slate-400 rounded-lg text-xs font-medium transition-colors"
+                          title="팩스 전송"
+                        >
+                          <Send size={13} /> 팩스
+                        </button>
+                        <button
                           onClick={() => handleDeleteProject(project)}
                           className="p-1.5 text-slate-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                           title="정산 삭제"
@@ -335,10 +373,10 @@ export default function SettlementPage() {
                 <tr className="bg-slate-800/50 border-b border-slate-700">
                   <th className="p-4 text-slate-300 font-semibold">발행일시</th>
                   <th className="p-4 text-slate-300 font-semibold">품명</th>
-                  <th className="p-4 text-slate-300 font-semibold">거래처 (사업자번호)</th>
-                  <th className="p-4 text-slate-300 font-semibold">담당자 수신처</th>
+                  <th className="p-4 text-slate-300 font-semibold">거래처</th>
                   <th className="p-4 text-slate-300 font-semibold">발행 금액</th>
-                  <th className="p-4 text-slate-300 font-semibold">상태</th>
+                  <th className="p-4 text-slate-300 font-semibold">결제 상태</th>
+                  <th className="p-4 text-slate-300 font-semibold text-center">출력 / 결제</th>
                 </tr>
               </thead>
               <tbody>
@@ -350,40 +388,87 @@ export default function SettlementPage() {
                       {invoiceSearch ? '검색 결과가 없습니다.' : '발행된 세금계산서가 없습니다.'}
                     </td>
                   </tr>
-                ) : filteredInvoices.map(inv => (
-                  <tr key={inv.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors">
-                    <td className="p-4 text-slate-400 text-sm">
-                      {new Date(inv.issuedAt).toLocaleString('ko-KR')}
-                    </td>
-                    <td className="p-4 font-medium text-white">{inv.itemName}</td>
-                    <td className="p-4">
-                      <p className="text-slate-300 font-medium">{inv.clientName}</p>
-                      <p className="text-slate-500 text-xs font-mono">{inv.businessNumber}</p>
-                    </td>
-                    <td className="p-4">
-                      <p className="text-slate-300 text-sm">{inv.managerName}</p>
-                      <p className="text-slate-500 text-xs">{inv.managerEmail}</p>
-                    </td>
-                    <td className="p-4 font-bold text-emerald-400">
-                      {inv.amount.toLocaleString()} 원
-                    </td>
-                    <td className="p-4">
-                      {inv.status === 'ISSUED' ? (
-                        <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-bold">
-                          발행 완료
-                        </span>
-                      ) : (
-                        <span className="px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-full text-xs font-bold">
-                          취소됨
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                ) : filteredInvoices.map(inv => {
+                  const supplyAmt = inv.amount;
+                  const vatAmt = inv.isVat ? Math.round(supplyAmt * 0.1) : 0;
+                  const totalAmt = supplyAmt + vatAmt;
+                  const paidAmt = inv.paidAmount ?? 0;
+                  const balance = totalAmt - paidAmt;
+                  const payStatus = inv.paymentStatus ?? 'UNPAID';
+
+                  return (
+                    <tr key={inv.id} className="border-b border-slate-800 hover:bg-slate-800/20 transition-colors group">
+                      <td className="p-4 text-slate-400 text-sm">
+                        {new Date(inv.issuedAt).toLocaleString('ko-KR')}
+                      </td>
+                      <td className="p-4 font-medium text-white">{inv.itemName}</td>
+                      <td className="p-4">
+                        <p className="text-slate-300 font-medium">{inv.clientName}</p>
+                        <p className="text-slate-500 text-xs font-mono">{inv.businessNumber}</p>
+                      </td>
+                      <td className="p-4">
+                        <p className="font-bold text-emerald-400">{totalAmt.toLocaleString()}원</p>
+                        {inv.isVat && <p className="text-xs text-slate-500">VAT포함 (공급가: {supplyAmt.toLocaleString()}원)</p>}
+                        {paidAmt > 0 && balance > 0 && (
+                          <p className="text-xs text-amber-400">미수금: {balance.toLocaleString()}원</p>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        {payStatus === 'PAID' ? (
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-bold w-fit">
+                            <BadgeCheck size={12} /> 결제완료
+                          </span>
+                        ) : payStatus === 'PARTIAL' ? (
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-bold w-fit">
+                            <AlertCircle size={12} /> 부분납부
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 px-3 py-1 bg-red-500/10 text-red-400 border border-red-500/20 rounded-full text-xs font-bold w-fit">
+                            <AlertCircle size={12} /> 미수
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center justify-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => setPrintModal({ invoice: inv, type: 'receipt' })}
+                            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-700 hover:bg-blue-600 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-colors"
+                            title="영수증 출력"
+                          >
+                            <Printer size={12} /> 영수증
+                          </button>
+                          <button
+                            onClick={() => setPrintModal({ invoice: inv, type: 'statement' })}
+                            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-700 hover:bg-indigo-600 text-slate-300 hover:text-white rounded-lg text-xs font-bold transition-colors"
+                            title="명세서 출력"
+                          >
+                            <BookText size={12} /> 명세서
+                          </button>
+                          {payStatus !== 'PAID' && (
+                            <button
+                              onClick={() => setPaymentModal(inv)}
+                              className="flex items-center gap-1 px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-500 text-emerald-200 hover:text-white rounded-lg text-xs font-bold transition-colors"
+                              title="결제 처리"
+                            >
+                              <CreditCard size={12} /> 결제
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         </>
+      )}
+
+      {/* ── 월별 분석 차트 탭 ── */}
+      {activeTab === 'CHART' && (
+        <div className="flex-1">
+          <MonthlyChart invoices={invoices} />
+        </div>
       )}
 
       {/* 정산 금액 등록 모달 */}
@@ -444,6 +529,18 @@ export default function SettlementPage() {
         onClose={() => setIsInvoiceModalOpen(false)}
         selectedProjects={selectedProjectsData}
         onSuccess={() => { setIsInvoiceModalOpen(false); setSelectedIds(new Set()); setActiveTab('ISSUED'); }}
+      />
+
+      <PaymentModal
+        invoice={paymentModal}
+        onClose={() => setPaymentModal(null)}
+        onSuccess={() => setPaymentModal(null)}
+      />
+
+      <PrintDocModal
+        invoice={printModal?.invoice ?? null}
+        type={printModal?.type ?? 'receipt'}
+        onClose={() => setPrintModal(null)}
       />
     </div>
   );

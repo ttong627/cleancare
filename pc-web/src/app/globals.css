@@ -1,148 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg-page:        linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 40%, #e8f4ff 70%, #ede9fe 100%);
+  --bg-card:        rgba(255, 255, 255, 0.85);
+  --bg-card-hover:  rgba(255, 255, 255, 0.95);
+  --blue-primary:   #0ea5e9;
+  --blue-deep:      #0369a1;
+  --blue-light:     #bae6fd;
+  --indigo:         #6366f1;
+  --cyan:           #06b6d4;
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-muted:     #64748b;
+  --border:         rgba(14, 165, 233, 0.2);
+  --shadow-sm:      0 2px 8px rgba(14, 165, 233, 0.12), 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md:      0 8px 32px rgba(14, 165, 233, 0.18), 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:      0 20px 60px rgba(14, 165, 233, 0.22), 0 8px 24px rgba(0,0,0,0.10);
+  --shadow-3d:      0 20px 60px rgba(14, 165, 233, 0.25), 0 8px 20px rgba(99,102,241,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
 }
 
-@theme inline {
-  --color-on-secondary: #ffffff;
-  --color-primary-fixed: #c6e7ff;
-  --color-on-tertiary-fixed: #1a1c1c;
-  --color-surface-tint: #003366;
-  --color-primary-container: #e1f5fe;
-  --color-on-tertiary-fixed-variant: #454747;
-  --color-surface-container-lowest: #ffffff;
-  --color-secondary-fixed: #d0e7ea;
-  --color-secondary: #4d6265;
-  --color-surface-container-low: #f0f7ff;
-  --color-on-tertiary-container: #37393a;
-  --color-on-secondary-fixed-variant: #364a4d;
-  --color-outline: #6e7881;
-  --color-inverse-on-surface: #f3f0f0;
-  --color-surface-container: #e8f4fd;
-  --color-tertiary-container: #a2a3a3;
-  --color-on-primary: #ffffff;
-  --color-error-container: #ffdad6;
-  --color-on-surface: #1b1c1c;
-  --color-on-error-container: #93000a;
-  --color-background: #fbf9f8;
-  --color-surface-container-highest: #e4e2e1;
-  --color-outline-variant: #bdc8d1;
-  --color-surface-dim: #dcd9d9;
-  --color-surface-bright: #fbf9f8;
-  --color-on-surface-variant: #3e4850;
-  --color-on-primary-fixed: #001e2d;
-  --color-tertiary-fixed-dim: #c6c6c7;
-  --color-on-primary-container: #003366;
-  --color-on-secondary-container: #53686b;
-  --color-surface: #fbf9f8;
-  --color-inverse-surface: #303030;
-  --color-error: #ba1a1a;
-  --color-on-background: #1b1c1c;
-  --color-surface-container-high: #eae8e7;
-  --color-secondary-fixed-dim: #b4cbce;
-  --color-surface-variant: #e4e2e1;
-  --color-on-tertiary: #ffffff;
-  --color-inverse-primary: #82cfff;
-  --color-primary: #003366;
-  --color-tertiary-fixed: #e2e2e2;
-  --color-on-secondary-fixed: #091f21;
-  --color-on-error: #ffffff;
-  --color-on-primary-fixed-variant: #004c6b;
-  --color-tertiary: #5d5f5f;
-  --color-primary-fixed-dim: #82cfff;
-  --color-brand-blue-deep: #003366;
-  --color-slate-dark: #003366;
+* { box-sizing: border-box; }
 
-  --spacing-lg: 48px;
-  --spacing-xl: 80px;
-  --spacing-2xl: 120px;
-  --spacing-container-max: 1200px;
-  --spacing-md: 24px;
-  --spacing-xs: 4px;
-  --spacing-gutter: 24px;
-  --spacing-sm: 12px;
-  --spacing-base: 8px;
-
-  --font-h1: Inter, Arial, Helvetica, sans-serif;
-  --font-h2: Inter, Arial, Helvetica, sans-serif;
-  --font-h3: Inter, Arial, Helvetica, sans-serif;
-  --font-body-lg: Inter, Arial, Helvetica, sans-serif;
-  --font-body-md: Inter, Arial, Helvetica, sans-serif;
-  --font-label-md: Inter, Arial, Helvetica, sans-serif;
-  --font-caption: Inter, Arial, Helvetica, sans-serif;
+html, body {
+  background: var(--bg-page);
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── 글라스모피즘 카드 ── */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.7);
+  box-shadow: var(--shadow-3d);
+  border-radius: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 70px rgba(14,165,233,0.28), 0 10px 28px rgba(99,102,241,0.14), inset 0 1px 0 rgba(255,255,255,0.9);
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── 프리미엄 버튼 ── */
+.btn-primary {
+  background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%);
+  color: white;
+  font-weight: 700;
+  padding: 10px 24px;
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(14,165,233,0.4), 0 2px 6px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.2);
+  transition: all 0.18s ease;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(14,165,233,0.5), 0 4px 10px rgba(0,0,0,0.14), inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* ── 인풋 스타일 ── */
+input, select, textarea {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  font-family: 'Inter', -apple-system, sans-serif;
+}
+input::placeholder, textarea::placeholder { color: #94a3b8 !important; }
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.25), 0 2px 8px rgba(14,165,233,0.15);
+  border-color: #0ea5e9 !important;
 }
 
-@layer utilities {
-  .text-h1 {
-    font-size: 48px;
-    line-height: 1.2;
-    letter-spacing: -0.02em;
-    font-weight: 700;
-  }
-  .text-h2 {
-    font-size: 36px;
-    line-height: 1.25;
-    letter-spacing: -0.01em;
-    font-weight: 600;
-  }
-  .text-h3 {
-    font-size: 24px;
-    line-height: 1.3;
-    font-weight: 600;
-  }
-  .text-body-lg {
-    font-size: 18px;
-    line-height: 1.6;
-    font-weight: 400;
-  }
-  .text-body-md {
-    font-size: 16px;
-    line-height: 1.6;
-    font-weight: 400;
-  }
-  .text-label-md {
-    font-size: 14px;
-    line-height: 1.4;
-    letter-spacing: 0.02em;
-    font-weight: 600;
-  }
-  .text-caption {
-    font-size: 12px;
-    line-height: 1.4;
-    font-weight: 400;
-  }
-  .text-hero {
-    font-size: 64px;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-    font-weight: 800;
-  }
+/* ── 배경 애니메이션 오브 (will-change로 GPU 가속) ── */
+.bg-orb {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  animation: float 10s ease-in-out infinite;
+  will-change: transform;
+}
+.bg-orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #bae6fd, transparent); top: -100px; right: -100px; }
+.bg-orb-2 { width: 400px; height: 400px; background: radial-gradient(circle, #c7d2fe, transparent); bottom: -80px; left: 10%; animation-delay: -4s; }
+.bg-orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, #a5f3fc, transparent); top: 50%; left: 60%; animation-delay: -2s; }
 
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
-  .icon-fill {
-    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
-  .shadow-ambient-low {
-    box-shadow: 0 4px 12px rgba(51, 51, 51, 0.05);
-  }
-  .shadow-ambient-med {
-    box-shadow: 0 8px 20px rgba(51, 51, 51, 0.05);
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50%       { transform: translateY(-24px) scale(1.04); }
+}
+
+/* ── 커스텀 스크롤바 ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: rgba(14,165,233,0.04); }
+::-webkit-scrollbar-thumb { background: rgba(14,165,233,0.28); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(14,165,233,0.48); }
+
+/* ── 유틸리티 ── */
+.gradient-text {
+  background: linear-gradient(135deg, #0ea5e9, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.shadow-blue { box-shadow: var(--shadow-md); }
+.shadow-blue-lg { box-shadow: var(--shadow-lg); }
+
+/* ── 페이드인 애니메이션 ── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in { animation: fadeIn 0.25s ease-out; }
+
+/* ── 인쇄 미디어 ── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
 }

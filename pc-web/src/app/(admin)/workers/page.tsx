@@ -31,16 +31,14 @@ export default function WorkersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
 
   useEffect(() => {
+    // 최초 1회 씨드 데이터 확인 (DB 리셋 후 재시드 방지를 위해 onSnapshot 밖에서 실행)
     const q = query(collection(db, 'workers'));
-    const unsubscribe = onSnapshot(q, async (snapshot) => {
-      if (snapshot.empty) {
-        await seedWorkersData();
-        return;
-      }
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as WorkerData));
       setWorkers(data);
       setIsLoading(false);
@@ -48,25 +46,38 @@ export default function WorkersPage() {
     return () => unsubscribe();
   }, []);
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) { toast.error('이름을 입력해주세요.'); return; }
     setIsSaving(true);
     try {
-      await addDoc(collection(db, 'workers'), {
-        name: form.name.trim(),
-        role: form.role.trim(),
-        phone: form.phone.trim(),
-        status: form.status,
-        lastLocation: form.lastLocation.trim() || '위치 정보 없음',
-        assignedProject: null,
-        createdAt: Date.now(),
-      });
-      toast.success(`${form.name} 작업자가 등록되었습니다.`);
+      if (editingId) {
+        await setDoc(doc(db, 'workers', editingId), {
+          name: form.name.trim(),
+          role: form.role.trim(),
+          phone: form.phone.trim(),
+          status: form.status,
+          lastLocation: form.lastLocation.trim() || '위치 정보 없음',
+          updatedAt: Date.now(),
+        }, { merge: true });
+        toast.success(`${form.name} 작업자 정보가 수정되었습니다.`);
+      } else {
+        await addDoc(collection(db, 'workers'), {
+          name: form.name.trim(),
+          role: form.role.trim(),
+          phone: form.phone.trim(),
+          status: form.status,
+          lastLocation: form.lastLocation.trim() || '위치 정보 없음',
+          assignedProject: null,
+          createdAt: Date.now(),
+        });
+        toast.success(`${form.name} 작업자가 등록되었습니다.`);
+      }
       setForm(EMPTY_FORM);
+      setEditingId(null);
       setIsModalOpen(false);
     } catch {
-      toast.error('등록에 실패했습니다.');
+      toast.error(editingId ? '수정에 실패했습니다.' : '등록에 실패했습니다.');
     } finally {
       setIsSaving(false);
     }
@@ -108,7 +119,7 @@ export default function WorkersPage() {
           <p className="text-slate-400">등록된 작업자의 실시간 위치(GPS), 근태 상태 및 프로젝트 배정 현황을 관제합니다.</p>
         </div>
         <button
-          onClick={() => { setForm(EMPTY_FORM); setIsModalOpen(true); }}
+          onClick={() => { setEditingId(null); setForm(EMPTY_FORM); setIsModalOpen(true); }}
           className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-medium shadow-lg shadow-blue-500/20 transition-colors"
         >
           <UserPlus size={18} /> 신규 작업자 등록
@@ -168,13 +179,32 @@ export default function WorkersPage() {
                     {worker.phone && <p className="text-xs text-slate-500 mt-0.5">{worker.phone}</p>}
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(worker)}
-                  className="text-slate-600 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-1"
-                  title="작업자 삭제"
-                >
-                  <Trash2 size={16} />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => {
+                      setEditingId(worker.id);
+                      setForm({
+                        name: worker.name,
+                        role: worker.role || '',
+                        phone: worker.phone || '',
+                        status: worker.status,
+                        lastLocation: worker.lastLocation || ''
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="text-slate-500 hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-slate-700/50"
+                    title="작업자 수정"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(worker)}
+                    className="text-slate-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 p-1.5 rounded-lg hover:bg-slate-700/50"
+                    title="작업자 삭제"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-2 mb-5">
@@ -210,14 +240,14 @@ export default function WorkersPage() {
           <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="px-6 py-5 border-b border-slate-800 flex justify-between items-center">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <UserPlus className="text-blue-400" size={22} /> 신규 작업자 등록
+                <UserPlus className="text-blue-400" size={22} /> {editingId ? '작업자 정보 수정' : '신규 작업자 등록'}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white p-1.5 rounded-full hover:bg-slate-800 transition-colors">
                 <X size={20} />
               </button>
             </div>
 
-            <form onSubmit={handleRegister} className="p-6 space-y-5">
+            <form onSubmit={handleSave} className="p-6 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-bold text-slate-300 mb-2">이름 <span className="text-red-400">*</span></label>
@@ -256,7 +286,7 @@ export default function WorkersPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-slate-300 mb-2">초기 상태</label>
+                <label className="block text-sm font-bold text-slate-300 mb-2">상태 설정</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(Object.entries(STATUS_MAP) as [WorkerStatus, typeof STATUS_MAP[WorkerStatus]][]).map(([key, cfg]) => (
                     <label
@@ -288,7 +318,7 @@ export default function WorkersPage() {
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 font-bold text-slate-300 bg-slate-800 border border-slate-600 rounded-xl hover:bg-slate-700 transition-colors">취소</button>
                 <button type="submit" disabled={isSaving} className="flex-1 py-3 font-bold text-white bg-blue-600 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-500/20 transition-colors flex items-center justify-center gap-2 disabled:opacity-50">
                   {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-                  등록 완료
+                  {editingId ? '수정 완료' : '등록 완료'}
                 </button>
               </div>
             </form>

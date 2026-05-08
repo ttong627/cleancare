@@ -50,6 +50,19 @@ export default function FaxPage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const docName = params.get('docName');
+      if (docName) {
+        setForm({ ...EMPTY_FORM, documentName: docName });
+        setIsModalOpen(true);
+        // Clear param from URL to prevent reopening on reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
+
   const pendingList  = faxList.filter(f => f.status === 'PENDING' || f.status === 'SENDING');
   const historyList  = faxList.filter(f => f.status === 'SUCCESS' || f.status === 'FAILED');
 
