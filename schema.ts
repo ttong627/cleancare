@@ -23,11 +23,25 @@ export interface User {
 
 // 2. 프로젝트 (Projects) 스키마
 export type ProjectStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED';
+export type PhotoRequirement = 'BEFORE_AFTER' | 'BEFORE_DURING_AFTER';
 
 export interface ProjectData {
   id: string;                  // 문서 ID
   name: string;                // 현장명 (예: "광교중학교 에어컨 세척")
   region: string;              // 지역 (예: "수원시") - 공무원 권한 매핑용
+  
+  // 📍 신규 추가: 일정 및 현장 세부 정보
+  address: string;             // 작업장 상세 주소 (예: "경기도 수원시 영통구 광교로 123")
+  coordinates?: {              // 자동 변환된 카카오맵 좌표 (위도/경도)
+    lat: number;
+    lng: number;
+  };
+  clientManager?: string;      // 현장 담당자 이름
+  clientContact?: string;      // 현장 담당자 연락처
+  scheduledDate: string;       // 배정된 날짜 (YYYY-MM-DD 형식, 캘린더 연동용)
+  taskDetails?: string;        // 작업 세부 내용
+  photoRequirement: PhotoRequirement; // 사진 촬영 필수 단계
+  memo?: string;               // 비고
   
   // 상태 및 담당자
   status: ProjectStatus;
@@ -46,6 +60,7 @@ export interface ProjectData {
   
   // AR 증빙 사진 URL (배열)
   beforeImages: string[];      // 작업 전 사진/도면
+  duringImages?: string[];     // 작업 중 사진 (전중후 모드일 경우)
   afterImages: string[];       // 작업 후 증빙
   
   createdAt: number;
