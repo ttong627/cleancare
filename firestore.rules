@@ -1,0 +1,46 @@
+// firestore.rules
+// 인가되지 않은 접근을 완벽히 차단하고 데이터 무결성을 유지하는 보안 코드입니다.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 로그인된 사용자만 접근 가능
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 관리자 여부 확인
+    function isAdmin() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+    }
+    
+    // 자신의 데이터인지 확인 (작업자)
+    function isOwner(workerId) {
+      return isAuthenticated() && request.auth.uid == workerId;
+    }
+
+    // 사용자 컬렉션: 본인 정보는 읽기 가능, 쓰기는 관리자만
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // 프로젝트 컬렉션
+    match /projects/{projectId} {
+      // 읽기: 관리자는 모두 읽기 가능, 작업자는 본인 할당 프로젝트만 읽기 가능
+      allow read: if isAdmin() || isOwner(resource.data.workerId);
+      
+      // 생성/수정: 관리자는 자유롭게 가능, 작업자는 본인 프로젝트의 상태/마커 정보만 업데이트 가능
+      allow create: if isAdmin();
+      allow update: if isAdmin() || (isOwner(resource.data.workerId) && 
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['markers', 'status', 'updatedAt', 'weather']));
+      allow delete: if isAdmin();
+    }
+    
+    // 팩스 히스토리: 관리자만 접근 가능
+    match /fax_history/{faxId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
