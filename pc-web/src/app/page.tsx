@@ -1,11 +1,15 @@
 'use client';
 
+import { useState } from 'react';
 import { AlertCircle, CheckCircle2, Clock, MapPin, Navigation, RefreshCcw, Loader2 } from 'lucide-react';
-import { useProjects, useUpdateProjectStatus } from '@/hooks/useProjects';
+import { useProjects, useUpdateProjectStatus, ProjectData } from '@/hooks/useProjects';
+import ProjectDetailsModal from '@/components/ProjectDetailsModal';
 
 export default function DashboardPage() {
   const { data: projects, isLoading } = useProjects();
   const { mutate: updateStatus, isPending } = useUpdateProjectStatus();
+  
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
 
   // 데이터 필터링 계산
   const rejectedCount = projects?.filter(p => p.status === 'REJECTED').length || 0;
@@ -16,7 +20,15 @@ export default function DashboardPage() {
   const rejectedProjects = projects?.filter(p => p.status === 'REJECTED') || [];
 
   return (
-    <div className="min-h-screen p-8 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black">
+    <div className="min-h-screen p-8 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-800 via-slate-900 to-black relative">
+      
+      {/* 모달 연동 */}
+      <ProjectDetailsModal 
+        project={selectedProject} 
+        isOpen={!!selectedProject} 
+        onClose={() => setSelectedProject(null)} 
+      />
+
       {/* 헤더 영역 */}
       <header className="flex justify-between items-center mb-10">
         <div>
@@ -24,18 +36,18 @@ export default function DashboardPage() {
             <Navigation className="text-blue-500" size={32} />
             크린케어 통합 관제센터
           </h1>
-          <p className="text-slate-400 mt-2">전국 현장 실시간 모니터링 (Exception-First) - 가상 데이터 연동 모드</p>
+          <p className="text-slate-400 mt-2">전국 현장 실시간 모니터링 (Exception-First) - 라이브 클라우드 서버 연동 중</p>
         </div>
         <div className="flex items-center gap-4">
           {isLoading && (
             <div className="flex items-center gap-2 text-slate-400">
               <Loader2 className="animate-spin" size={20} />
-              <span className="text-sm">데이터 동기화 중...</span>
+              <span className="text-sm">클라우드 동기화 중...</span>
             </div>
           )}
           <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-sm font-medium text-slate-300">시스템 정상 가동중</span>
+            <span className="text-sm font-medium text-slate-300">Firestore 통신 정상</span>
           </div>
         </div>
       </header>
@@ -94,7 +106,7 @@ export default function DashboardPage() {
       </h3>
       
       {isLoading ? (
-        // 로딩 스켈레톤 UI (Zero-Loading 시각 효과)
+        // 로딩 스켈레톤 UI
         <div className="grid grid-cols-1 gap-4">
           {[1, 2, 3].map(i => (
             <div key={i} className="h-24 rounded-xl bg-white/5 border border-white/10 animate-pulse"></div>
@@ -123,10 +135,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex gap-3">
                 <button 
-                  onClick={() => alert('현장 라이브러리 및 도면 뷰어 팝업 오픈 예정 (현재 설계 단계)')}
-                  className="px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
+                  onClick={() => setSelectedProject(project)}
+                  className="px-5 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors border border-slate-600"
                 >
-                  상세 보기
+                  상세 보기 및 정산
                 </button>
                 <button 
                   onClick={() => updateStatus({ id: project.id, status: 'IN_PROGRESS' })}

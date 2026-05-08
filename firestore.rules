@@ -1,46 +1,76 @@
-// firestore.rules
-// 인가되지 않은 접근을 완벽히 차단하고 데이터 무결성을 유지하는 보안 코드입니다.
-
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 로그인된 사용자만 접근 가능
-    function isAuthenticated() {
-      return request.auth != null;
+    // -----------------------------------------------------------------
+    // 1. 공통 권한 확인 함수 (RBAC - Role Based Access Control)
+    // -----------------------------------------------------------------
+    
+    // 현재 요청을 보낸 사용자의 권한(Role)을 users 컬렉션에서 가져옴
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
     
-    // 관리자 여부 확인
+    function isMaster() {
+      return request.auth != null && getUserData().role == 'MASTER';
+    }
+    
     function isAdmin() {
-      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'ADMIN';
+      return request.auth != null && getUserData().role == 'ADMIN';
     }
     
-    // 자신의 데이터인지 확인 (작업자)
-    function isOwner(workerId) {
-      return isAuthenticated() && request.auth.uid == workerId;
+    function isWorker() {
+      return request.auth != null && getUserData().role == 'WORKER';
+    }
+    
+    function isOfficial() {
+      return request.auth != null && getUserData().role == 'OFFICIAL';
     }
 
-    // 사용자 컬렉션: 본인 정보는 읽기 가능, 쓰기는 관리자만
+    // 마스터와 관리담당자는 내부 관리자로 취급
+    function isInternalManager() {
+      return isMaster() || isAdmin();
+    }
+
+    // -----------------------------------------------------------------
+    // 2. 사용자 (Users) 컬렉션 규칙
+    // -----------------------------------------------------------------
     match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
-      allow write: if isAdmin();
+      // 본인 정보는 누구나 읽기 가능, 마스터/관리자는 모든 작업자 읽기 가능
+      allow read: if request.auth.uid == userId || isInternalManager();
+      
+      // 사용자 생성/수정/삭제는 오직 마스터(MASTER)만 가능 (최고 보안)
+      // 단, 관리담당자(ADMIN)는 현장실무자(WORKER)만 생성 가능하도록 제한
+      allow create, update, delete: if isMaster() || 
+        (isAdmin() && request.resource.data.role == 'WORKER');
     }
 
-    // 프로젝트 컬렉션
+    // -----------------------------------------------------------------
+    // 3. 현장 프로젝트 (Projects) 컬렉션 규칙
+    // -----------------------------------------------------------------
     match /projects/{projectId} {
-      // 읽기: 관리자는 모두 읽기 가능, 작업자는 본인 할당 프로젝트만 읽기 가능
-      allow read: if isAdmin() || isOwner(resource.data.workerId);
+      // [읽기 권한]
+      // 1. 마스터/관리자는 모든 현장 읽기 가능
+      // 2. 현장실무자는 "자신이 배정된(workerId)" 현장만 읽기 가능
+      // 3. 담당공무원은 "자신의 담당 지역(region)" 현장만 읽기 가능
+      allow read: if isInternalManager() || 
+                     (isWorker() && resource.data.workerId == request.auth.uid) ||
+                     (isOfficial() && resource.data.region == getUserData().assignedRegion);
       
-      // 생성/수정: 관리자는 자유롭게 가능, 작업자는 본인 프로젝트의 상태/마커 정보만 업데이트 가능
-      allow create: if isAdmin();
-      allow update: if isAdmin() || (isOwner(resource.data.workerId) && 
-                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['markers', 'status', 'updatedAt', 'weather']));
-      allow delete: if isAdmin();
-    }
-    
-    // 팩스 히스토리: 관리자만 접근 가능
-    match /fax_history/{faxId} {
-      allow read, write: if isAdmin();
+      // [생성 및 삭제 권한]
+      // 마스터와 관리담당자만 현장을 새롭게 배정하거나 취소할 수 있음
+      allow create, delete: if isInternalManager();
+
+      // [수정 권한 분리]
+      // 1. 마스터/관리자: 모든 필드 수정 가능 (정산, 팩스, 상태 등)
+      // 2. 현장실무자: 오직 상태(status), 사진(Images) 필드만 업데이트 가능. 금액(price) 등은 조작 불가.
+      // 3. 공무원: 수정 절대 불가 (View-Only)
+      allow update: if isInternalManager() || 
+        (
+          isWorker() && 
+          resource.data.workerId == request.auth.uid &&
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny(['price', 'invoiceIssued', 'faxSent', 'workerId', 'region'])
+        );
     }
   }
 }

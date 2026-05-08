@@ -3,14 +3,14 @@ import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
 
-// GCP/Firebase 프로젝트 설정값 (추후 실제 값으로 변경하시면 됩니다)
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDwcjhD8ZT28cy-kk2dPoKC5zDCWHAhyPI",
+  authDomain: "cleancare-cf307.firebaseapp.com",
+  projectId: "cleancare-cf307",
+  storageBucket: "cleancare-cf307.firebasestorage.app",
+  messagingSenderId: "545863599367",
+  appId: "1:545863599367:web:68d1f6050293258217f1a2",
+  measurementId: "G-XLT5YGZXMK"
 };
 
 // 중복 초기화 방지 및 무지연 싱글톤 패턴 적용
