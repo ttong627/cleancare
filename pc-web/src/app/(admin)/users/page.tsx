@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { UserCog, UserPlus, Trash2, Shield, Briefcase, Users, Search, X, Save, Loader2, Mail, Phone, Edit } from 'lucide-react';
 import { collection, query, onSnapshot, addDoc, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { sendEmail, approvalEmailHtml } from '@/lib/email';
+import { sendApprovalEmail } from '@/lib/email';
 import toast from 'react-hot-toast';
 
 type UserRole = 'MASTER' | 'ADMIN' | 'WORKER' | 'PENDING';
@@ -78,7 +78,7 @@ export default function UsersPage() {
     return () => unsubscribe();
   }, []);
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) {
       toast.error('이름과 이메일은 필수입니다.');
@@ -143,10 +143,10 @@ export default function UsersPage() {
       // PENDING → 활성 권한 승인 시 이메일 발송
       if (user.role === 'PENDING' && newRole !== 'PENDING' && user.email) {
         try {
-          await sendEmail({
-            to: user.email,
-            subject: '[크린케어] 계정 승인이 완료되었습니다',
-            html: approvalEmailHtml(user.name, newRole),
+          await sendApprovalEmail({
+            to_email: user.email,
+            to_name: user.name,
+            role_label: ROLE_CONFIG[newRole].label,
           });
           toast.success(`${user.name}에게 승인 안내 메일을 발송했습니다.`);
         } catch (emailErr) {

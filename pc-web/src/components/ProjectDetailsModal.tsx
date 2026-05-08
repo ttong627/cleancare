@@ -7,7 +7,7 @@ import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage
 import { doc, updateDoc } from 'firebase/firestore';
 import { storage, db } from '@/lib/firebase';
 import { ProjectData } from '@/hooks/useProjects';
-import { sendEmail, reportEmailHtml } from '@/lib/email';
+import { sendReportEmail } from '@/lib/email';
 import InvoiceIssueModal from '@/components/InvoiceIssueModal';
 
 interface ProjectDetailsModalProps {
@@ -115,10 +115,11 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, currentU
       const completedAt = project.updatedAt
         ? new Date(project.updatedAt).toLocaleString('ko-KR')
         : '기록 없음';
-      await sendEmail({
-        to: emailAddr,
-        subject: `[크린케어] ${project.name} 작업 완료 보고`,
-        html: reportEmailHtml(project.name, project.workerName, completedAt),
+      await sendReportEmail({
+        to_email: emailAddr,
+        project_name: project.name,
+        worker_name: project.workerName,
+        completed_at: completedAt,
       });
       toast.success(`${emailAddr}로 완료 보고 메일을 발송했습니다.`);
     } catch (err: unknown) {
