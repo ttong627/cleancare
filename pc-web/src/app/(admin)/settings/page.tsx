@@ -3,8 +3,16 @@
 import { Shield, Key, Database, RefreshCcw, Smartphone, ToggleLeft, ToggleRight, CheckCircle2, Download, Upload } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { collection, getDocs, setDoc, doc, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, doc, writeBatch } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+
+const COLLECTIONS = ['projects', 'assignments', 'workers', 'clients', 'invoices', 'faxQueue'] as const;
+
+function chunkArray<T>(arr: T[], size: number): T[][] {
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
+}
 
 export default function SettingsPage() {
   const [rbacEnabled, setRbacEnabled] = useState(true);
@@ -26,21 +34,22 @@ export default function SettingsPage() {
     toast.success('Firebase Firestore 연결 및 권한 검증 완료!', { icon: '🟢' });
   };
 
-  // DB 백업 (JSON 다운로드)
+  // DB 백업 (JSON 다운로드) — 전체 컬렉션 포함
   const handleBackupDB = async () => {
     setIsProcessingDB(true);
-    const toastId = toast.loading('데이터베이스 백업을 생성하는 중...');
+    const toastId = toast.loading('전체 데이터베이스 백업 중...');
     try {
-      const projectsSnap = await getDocs(collection(db, 'projects'));
-      const projectsData = projectsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      
-      const backupData = {
-        timestamp: new Date().toISOString(),
-        collections: {
-          projects: projectsData,
-        }
-      };
+      const results = await Promise.all(
+        COLLECTIONS.map(async (colName) => {
+          const snap = await getDocs(collection(db, colName));
+          return [colName, snap.docs.map(d => ({ id: d.id, ...d.data() }))] as const;
+        })
+      );
 
+      const collections = Object.fromEntries(results);
+      const totalCount = results.reduce((sum, [, docs]) => sum + docs.length, 0);
+
+      const backupData = { timestamp: new Date().toISOString(), version: '2.0', collections };
       const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -48,8 +57,8 @@ export default function SettingsPage() {
       a.download = `cleancare_db_backup_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      
-      toast.success(`총 ${projectsData.length}건의 데이터를 성공적으로 백업했습니다.`, { id: toastId });
+
+      toast.success(`총 ${totalCount}건 (${COLLECTIONS.length}개 컬렉션) 백업 완료`, { id: toastId });
     } catch (error) {
       console.error(error);
       toast.error('데이터베이스 백업 실패', { id: toastId });
@@ -58,41 +67,53 @@ export default function SettingsPage() {
     }
   };
 
-  // DB 복원 (JSON 업로드)
+  // DB 복원 (JSON 업로드) — 기존 데이터 삭제 후 완전 복원
   const handleRestoreDB = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!confirm('경고: 현재 데이터베이스의 내용이 업로드한 백업 파일 내용으로 덮어쓰기 됩니다. 계속하시겠습니까?')) {
+    if (!confirm('경고: 기존 데이터베이스의 모든 데이터를 삭제하고 백업 파일로 완전 복원합니다. 계속하시겠습니까?')) {
       e.target.value = '';
       return;
     }
 
     setIsProcessingDB(true);
-    const toastId = toast.loading('백업 파일을 클라우드로 복원하는 중...');
-    
+    const toastId = toast.loading('기존 데이터 삭제 후 완전 복원 중...');
+
     const reader = new FileReader();
     reader.onload = async (event) => {
       try {
         const json = JSON.parse(event.target?.result as string);
-        const projects = json.collections?.projects;
-        
-        if (!projects || !Array.isArray(projects)) {
-          throw new Error('유효하지 않은 백업 파일 포맷입니다.');
+        const cols = json.collections;
+        if (!cols || typeof cols !== 'object') throw new Error('유효하지 않은 백업 파일 포맷입니다.');
+
+        let totalRestored = 0;
+
+        for (const colName of COLLECTIONS) {
+          const items: Array<{ id: string; [key: string]: unknown }> = cols[colName] ?? [];
+
+          // 1. 기존 문서 전체 삭제 (500건 단위 배치)
+          const existingSnap = await getDocs(collection(db, colName));
+          for (const chunk of chunkArray(existingSnap.docs, 500)) {
+            const batch = writeBatch(db);
+            chunk.forEach(d => batch.delete(d.ref));
+            await batch.commit();
+          }
+
+          // 2. 백업 데이터 쓰기 (500건 단위 배치)
+          for (const chunk of chunkArray(items, 500)) {
+            const batch = writeBatch(db);
+            chunk.forEach(item => {
+              const { id, ...data } = item;
+              batch.set(doc(db, colName, id), data);
+            });
+            await batch.commit();
+          }
+
+          totalRestored += items.length;
         }
 
-        // Firestore Batch write (한 번에 다수의 문서 쓰기)
-        const batch = writeBatch(db);
-        
-        // 기존 문서 삭제 로직은 보안상 생략하고, 덮어쓰기만 진행
-        projects.forEach((item: any) => {
-          const { id, ...data } = item;
-          const docRef = doc(db, 'projects', id);
-          batch.set(docRef, data);
-        });
-
-        await batch.commit();
-        toast.success(`총 ${projects.length}건의 데이터를 성공적으로 복원했습니다!`, { id: toastId });
+        toast.success(`총 ${totalRestored}건 완전 복원 완료!`, { id: toastId });
       } catch (error) {
         console.error(error);
         toast.error('DB 복원 실패: 파일이 손상되었거나 포맷이 다릅니다.', { id: toastId });

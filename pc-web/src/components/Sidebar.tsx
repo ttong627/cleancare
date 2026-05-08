@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Receipt, Users, Settings, LogOut, Printer, Key, Briefcase } from 'lucide-react';
+import { LayoutDashboard, Receipt, Users, Settings, LogOut, Printer, Key, Briefcase, UserCog } from 'lucide-react';
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -12,6 +12,7 @@ export default function Sidebar() {
     { name: '작업 현장 및 일정 관리', href: '/assignments', icon: Briefcase },
     { name: '정산 및 전자세금계산서', href: '/settlement', icon: Receipt },
     { name: '현장 작업자 관리', href: '/workers', icon: Users },
+    { name: '사용자 및 권한 관리', href: '/users', icon: UserCog },
     { name: '관공서 팩스 일괄 전송', href: '/fax', icon: Printer },
     { name: '외부 API 연동 설정', href: '/settings/api', icon: Key },
     { name: '시스템 환경 설정', href: '/settings', icon: Settings },

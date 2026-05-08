@@ -12,6 +12,9 @@ export interface ProjectData {
   rejectReason?: string;
   timeElapsed?: string;
   createdAt?: number;
+  updatedAt?: number;
+  price?: number;
+  invoiceIssued?: boolean;
 }
 
 // 웹소켓(Firestore Listener) 기반 무지연 실시간 알림 적용 (V2.0 설계서 반영)

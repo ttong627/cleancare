@@ -65,12 +65,58 @@ service cloud.firestore {
       // 1. 마스터/관리자: 모든 필드 수정 가능 (정산, 팩스, 상태 등)
       // 2. 현장실무자: 오직 상태(status), 사진(Images) 필드만 업데이트 가능. 금액(price) 등은 조작 불가.
       // 3. 공무원: 수정 절대 불가 (View-Only)
-      allow update: if isInternalManager() || 
+      allow update: if isInternalManager() ||
         (
-          isWorker() && 
+          isWorker() &&
           resource.data.workerId == request.auth.uid &&
           !request.resource.data.diff(resource.data).affectedKeys().hasAny(['price', 'invoiceIssued', 'faxSent', 'workerId', 'region'])
         );
+    }
+
+    // -----------------------------------------------------------------
+    // 4. 배정 일정 (Assignments) 컬렉션 규칙
+    // -----------------------------------------------------------------
+    match /assignments/{assignmentId} {
+      // 마스터/관리자: 전체 CRUD
+      // 현장실무자: 본인에게 배정된 일정만 읽기 가능 (수정 불가)
+      allow read: if isInternalManager() ||
+                     (isWorker() && resource.data.workerId == request.auth.uid);
+      allow create, update, delete: if isInternalManager();
+    }
+
+    // -----------------------------------------------------------------
+    // 5. 작업자 (Workers) 컬렉션 규칙
+    // -----------------------------------------------------------------
+    match /workers/{workerId} {
+      // 마스터/관리자: 전체 CRUD
+      // 현장실무자: 본인 문서만 읽기 및 위치(lastLocation) 필드만 수정 가능
+      allow read: if isInternalManager() ||
+                     (isWorker() && workerId == request.auth.uid);
+      allow create, delete: if isInternalManager();
+      allow update: if isInternalManager() ||
+        (
+          isWorker() &&
+          workerId == request.auth.uid &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLocation', 'status'])
+        );
+    }
+
+    // -----------------------------------------------------------------
+    // 6. 거래처 (Clients) 컬렉션 규칙
+    // -----------------------------------------------------------------
+    match /clients/{clientId} {
+      // 거래처 정보는 내부 관리자만 접근 가능 (사업자번호 등 민감 정보 포함)
+      allow read, write: if isInternalManager();
+    }
+
+    // -----------------------------------------------------------------
+    // 7. 세금계산서 (Invoices) 컬렉션 규칙
+    // -----------------------------------------------------------------
+    match /invoices/{invoiceId} {
+      // 마스터/관리자: 전체 읽기/생성 가능
+      // 취소(삭제)는 마스터만 가능
+      allow read, create: if isInternalManager();
+      allow update, delete: if isMaster();
     }
   }
 }
