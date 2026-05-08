@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'screens/login_screen.dart';
+import 'screens/ar_camera_screen.dart';
 
 void main() {
   runApp(const CleanCareApp());
@@ -10,7 +12,7 @@ class CleanCareApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '크린케어 작업자용',
+      title: '크린케어 현장팀',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
@@ -20,18 +22,20 @@ class CleanCareApp extends StatelessWidget {
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
-      home: const WorkerHomeScreen(),
+      // 초기 라우트를 로그인 화면으로 변경
+      home: const LoginScreen(),
     );
   }
 }
 
+// 작업자 홈 화면 (기존 코드 유지 및 일부 버튼 네비게이션 추가)
 class WorkerHomeScreen extends StatelessWidget {
   const WorkerHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // 부드러운 배경색 (Slate 50)
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text('오늘의 작업 내역', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
         backgroundColor: Colors.white,
@@ -53,7 +57,7 @@ class WorkerHomeScreen extends StatelessWidget {
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], // 청량한 그라데이션
+                  colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], 
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -77,7 +81,6 @@ class WorkerHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 32),
             
-            // 작업 리스트 타이틀
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -90,7 +93,6 @@ class WorkerHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             
-            // 작업 카드 1 (일반 진행 대기)
             _buildJobCard(
               context,
               title: '수원 광교중학교 에어컨 세척',
@@ -100,7 +102,6 @@ class WorkerHomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             
-            // 작업 카드 2 (PC에서 반려된 긴급 수정 건)
             _buildJobCard(
               context,
               title: '판교 테크원타워 로비 청소',
@@ -114,7 +115,6 @@ class WorkerHomeScreen extends StatelessWidget {
     );
   }
 
-  // 작업 리스트 공통 카드 위젯
   Widget _buildJobCard(BuildContext context, {required String title, required String time, required String status, required bool isUrgent}) {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -175,7 +175,12 @@ class WorkerHomeScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ARCameraScreen()),
+                    );
+                  },
                   icon: const Icon(Icons.view_in_ar, size: 18),
                   label: const Text('AR 촬영 진입', style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
