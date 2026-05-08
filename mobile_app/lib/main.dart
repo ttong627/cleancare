@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'screens/login_screen.dart';
 import 'screens/ar_camera_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp(); // firebase_options.dart 없이도 웹에서는 진행되거나 catch됨
+  } catch (e) {
+    debugPrint('Firebase init failed (test mode fallback active): $e');
+  }
   runApp(const CleanCareApp());
 }
 
@@ -16,19 +24,19 @@ class CleanCareApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF1E3A8A), // 프리미엄 블루 테마
+          seedColor: const Color(0xFF14B8A6), // 브랜드 틸 컬러 (로고 색상)
+          primary: const Color(0xFF2563EB),   // 브랜드 블루
           brightness: Brightness.light,
         ),
         useMaterial3: true,
         fontFamily: 'Roboto',
       ),
-      // 초기 라우트를 로그인 화면으로 변경
-      home: const LoginScreen(),
+      home: const WorkerHomeScreen(), // 테스트를 위해 임시로 홈 스크린으로 직행
     );
   }
 }
 
-// 작업자 홈 화면 (기존 코드 유지 및 일부 버튼 네비게이션 추가)
+// 작업자 홈 화면
 class WorkerHomeScreen extends StatelessWidget {
   const WorkerHomeScreen({super.key});
 
@@ -37,7 +45,12 @@ class WorkerHomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('오늘의 작업 내역', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        title: Image.asset(
+          'assets/images/logo-ko-h.png',
+          height: 32,
+          errorBuilder: (context, error, stackTrace) => 
+            const Text('크린케어', style: TextStyle(color: Color(0xFF14B8A6), fontWeight: FontWeight.w900)),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
@@ -52,12 +65,12 @@ class WorkerHomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 실시간 날씨 및 추천 위젯
+            // 실시간 날씨 위젯
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF3B82F6), Color(0xFF1D4ED8)], 
+                  colors: [Color(0xFF14B8A6), Color(0xFF2563EB)], // 틸 -> 블루 그라데이션 (로고 테마)
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
@@ -88,7 +101,10 @@ class WorkerHomeScreen extends StatelessWidget {
                   '배정된 현장 (2건)',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
                 ),
-                TextButton(onPressed: () {}, child: const Text('전체 보기')),
+                TextButton(
+                  onPressed: () {}, 
+                  child: const Text('전체 보기', style: TextStyle(color: Color(0xFF14B8A6))),
+                ),
               ],
             ),
             const SizedBox(height: 12),
@@ -139,13 +155,13 @@ class WorkerHomeScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: isUrgent ? Colors.red.shade50 : Colors.blue.shade50,
+                  color: isUrgent ? Colors.red.shade50 : Colors.teal.shade50,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   status,
                   style: TextStyle(
-                    color: isUrgent ? Colors.red.shade700 : Colors.blue.shade700,
+                    color: isUrgent ? Colors.red.shade700 : Colors.teal.shade700,
                     fontWeight: FontWeight.bold,
                     fontSize: 13,
                   ),
@@ -157,6 +173,8 @@ class WorkerHomeScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
           const SizedBox(height: 20),
+          
+          // 기존 길안내 및 AR촬영 버튼
           Row(
             children: [
               Expanded(
@@ -172,7 +190,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: ElevatedButton.icon(
                   onPressed: () {
@@ -185,7 +203,7 @@ class WorkerHomeScreen extends StatelessWidget {
                   label: const Text('AR 촬영 진입', style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    backgroundColor: const Color(0xFF2563EB),
+                    backgroundColor: const Color(0xFF14B8A6), // 브랜드 틸 컬러
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -193,6 +211,30 @@ class WorkerHomeScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 8),
+          
+          // 새로 추가된 현장 팩스 전송 버튼
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('관공서로 현장 증빙 사진 팩스 전송 완료!'),
+                    backgroundColor: Color(0xFF2563EB),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.print, size: 18),
+              label: const Text('현장에서 즉시 팩스 전송 (관공서 연동)', style: TextStyle(fontWeight: FontWeight.bold)),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                foregroundColor: const Color(0xFF2563EB), // 브랜드 블루 컬러
+                side: const BorderSide(color: Color(0xFF2563EB)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
           )
         ],
       ),

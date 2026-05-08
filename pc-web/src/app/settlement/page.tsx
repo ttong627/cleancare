@@ -79,7 +79,7 @@ export default function SettlementPage() {
 
   const totalAmount = completedProjects
     .filter(p => selectedIds.has(p.id))
-    .reduce((sum, p) => sum + (p as any).price, 0);
+    .reduce((sum, p) => sum + (p as ProjectData & { price: number }).price, 0);
 
   return (
     <div className="p-8 min-h-screen flex flex-col">
@@ -166,7 +166,7 @@ export default function SettlementPage() {
                 <td colSpan={6} className="p-8 text-center text-slate-500">발행 대기 중인 완료 현장이 없습니다.</td>
               </tr>
             ) : (
-              completedProjects.map((project: any) => (
+              (completedProjects as (ProjectData & { price: number })[]).map((project) => (
                 <tr key={project.id} className="border-b border-slate-800 hover:bg-slate-800/30 transition-colors group">
                   <td className="p-4 text-center">
                     <button onClick={() => toggleSelect(project.id)} className="text-slate-500 group-hover:text-slate-300 transition-colors">
