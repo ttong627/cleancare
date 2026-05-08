@@ -1,0 +1,46 @@
+name: mobile_app
+description: "Clean Care Mobile App for Field Workers"
+publish_to: 'none'
+
+version: 1.0.4+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Firebase Core & Auth & Firestore
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.6
+  cloud_firestore: ^4.15.6
+
+  # AR & Camera
+  camera: ^0.10.5+9
+  ar_flutter_plugin: ^0.7.3 # ARKit / ARCore plugin
+
+  # State Management & Utils
+  provider: ^6.1.2
+  shared_preferences: ^2.2.2
+  
+  # Offline Database (Isar)
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+
+  # UI Libraries
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  isar_generator: ^3.1.0+1
+  build_runner: ^2.4.8
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/logo-en-v.png
+    - assets/images/logo-ko-h.png
+    - assets/images/logo-en-h.png
