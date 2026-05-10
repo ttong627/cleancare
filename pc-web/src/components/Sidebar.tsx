@@ -5,7 +5,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Receipt, Users, Settings, LogOut, Printer, Key, Briefcase, UserCog, FileText, MoreVertical, User as UserIcon, Smartphone } from 'lucide-react';
+import { LayoutDashboard, Receipt, Users, Settings, LogOut, Printer, Key, Briefcase, UserCog, FileText, MoreVertical, User as UserIcon, Smartphone, Camera, BookImage } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function Sidebar() {
@@ -20,7 +20,8 @@ export default function Sidebar() {
     { name: '현장 작업자 관리', href: '/workers', icon: Users },
     { name: '관공서 팩스 일괄 전송', href: '/fax', icon: Printer },
     { name: '작업 보고서 및 출력 관리', href: '/reports', icon: FileText },
-    { name: '작업자 모바일 앱', href: '/mobile', icon: Smartphone },
+    { name: '현장 사진 관리', href: '/photos', icon: Camera },
+    { name: '작업사진대장', href: '/photo-ledger', icon: BookImage },
   ];
 
   const adminMenu = [
@@ -39,7 +40,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className="w-64 h-screen fixed left-0 top-0 flex flex-col z-20"
+      className="w-64 h-screen fixed left-0 top-0 hidden md:flex flex-col z-20"
       style={{
         background: 'linear-gradient(180deg, rgba(255,255,255,0.95) 0%, rgba(240,249,255,0.95) 100%)',
         backdropFilter: 'blur(20px)',

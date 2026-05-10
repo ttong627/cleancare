@@ -4,6 +4,26 @@ import { db } from '@/lib/firebase';
 
 export type ProjectStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'REJECTED';
 
+export interface ExtraPhotoData {
+  id: string;
+  url?: string;
+  localPath?: string;
+  capturedAt?: number;
+}
+
+export interface ArSpotData {
+  name: string;
+  beforeUrl?: string;
+  duringUrl?: string;
+  afterUrl?: string;
+  lat?: number;
+  lng?: number;
+  startedAt?: number;
+  completedAt?: number;
+  note?: string;
+  extraPhotos?: ExtraPhotoData[];
+}
+
 export interface ProjectData {
   id: string;
   name: string;
@@ -28,9 +48,14 @@ export interface ProjectData {
     uploadedAt: number;
     uploadedBy: string;
     storagePath: string;
+    arSpotName?: string; // 플랜 B: AR 지정 스팟 이름
+    isForceCaptured?: boolean; // 플랜 B: 수동 강제 촬영 여부 (오류 예외 처리)
   }>;
   lat?: number;
   lng?: number;
+  arSpots?: Record<string, ArSpotData>;
+  arSpotCounter?: number;
+  photoMode?: 'ba' | 'bda'; // 'ba' = 전/후 2단계, 'bda' = 전/중/후 3단계
 }
 
 // 실시간 구독 훅 (onSnapshot 기반, 무지연 Zero-Loading)

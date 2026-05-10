@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "545863599367",
+    "project_id": "cleancare-cf307",
+    "storage_bucket": "cleancare-cf307.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545863599367:android:1468b99cd78b32f817f1a2",
+        "android_client_info": {
+          "package_name": "com.cleancaresystem.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9drNluRpRXy2qU--PurgVPxtXL7yccKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:545863599367:android:2636aa3add3d131017f1a2",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9drNluRpRXy2qU--PurgVPxtXL7yccKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

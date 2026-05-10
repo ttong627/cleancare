@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // APK 다운로드 — 누구나 읽기 가능
+    match /apk/{fileName} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+
+    // 사용설명서 — 누구나 읽기 가능
+    match /manual/{fileName} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+
+    // 현장 사진 — 인증된 사용자만
+    match /photos/{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

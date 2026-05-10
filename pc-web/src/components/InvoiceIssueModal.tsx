@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Client, ClientManager, Invoice } from '@/schema';
+import { Client, Invoice } from '@/schema';
 import { collection, query, onSnapshot, addDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { X, Send, Building2, User, Mail, Coins, FileText, Printer, FileDown } from 'lucide-react';
+import { X, Building2, User, Mail, Coins, FileText, Printer, FileDown } from 'lucide-react';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -118,10 +118,10 @@ export default function InvoiceIssueModal({ isOpen, onClose, selectedProjects, o
       
       await addDoc(collection(db, 'invoices'), invoiceData);
 
-      // 2. 선택된 Projects의 invoiceIssued 상태 업데이트
-      for (const p of selectedProjects) {
-        await updateDoc(doc(db, 'projects', p.id), { invoiceIssued: true });
-      }
+      // 2. 선택된 Projects의 invoiceIssued 상태 업데이트 (병렬)
+      await Promise.all(
+        selectedProjects.map(p => updateDoc(doc(db, 'projects', p.id), { invoiceIssued: true }))
+      );
 
       toast.success('정산서 출력 및 세금계산서 연동이 완료되었습니다!', { id: 'issue' });
       onSuccess();
@@ -221,9 +221,13 @@ export default function InvoiceIssueModal({ isOpen, onClose, selectedProjects, o
                   <label className="block text-sm font-bold text-slate-700 mb-2 flex items-center gap-1"><Coins size={14}/> 청구 금액 (공급가액)</label>
                   <div className="relative">
                     <input 
-                      type="number" 
-                      value={amount} 
-                      onChange={(e) => setAmount(Number(e.target.value))}
+                      type="text"
+                      inputMode="numeric"
+                      value={amount ? amount.toLocaleString() : ''}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+                        setAmount(raw ? Number(raw) : 0);
+                      }}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-right font-bold text-lg" 
                     />
                     <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 font-medium">원</span>
@@ -295,7 +299,7 @@ export default function InvoiceIssueModal({ isOpen, onClose, selectedProjects, o
                 </tr>
               </thead>
               <tbody>
-                {selectedProjects.map((p, i) => (
+                {selectedProjects.map((p) => (
                   <tr key={p.id} className="border-b border-gray-200">
                     <td className="py-3 px-4">{p.name}</td>
                     <td className="py-3 px-4 text-right">{p.price.toLocaleString()} 원</td>

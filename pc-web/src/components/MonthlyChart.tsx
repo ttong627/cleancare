@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend,
@@ -38,7 +38,7 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   );
 };
 
-export default function MonthlyChart({ invoices }: MonthlyChartProps) {
+const MonthlyChart = memo(function MonthlyChart({ invoices }: MonthlyChartProps) {
   const now = new Date();
   const currentYear = now.getFullYear();
 
@@ -176,4 +176,6 @@ export default function MonthlyChart({ invoices }: MonthlyChartProps) {
       </div>
     </div>
   );
-}
+});
+
+export default MonthlyChart;

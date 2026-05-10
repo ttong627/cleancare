@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useRef } from 'react';
 import { X, Printer, FileText } from 'lucide-react';
@@ -17,7 +17,7 @@ interface Props {
 
 export default function PrintDocModal({
   invoice, type, onClose,
-  companyName = '(주)클린케어',
+  companyName = '(주)크린케어',
   companyBizNum = '000-00-00000',
   companyCeo = '대표자',
   companyPhone = '000-0000-0000',

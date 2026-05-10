@@ -137,12 +137,14 @@ export default function PaymentModal({ invoice, onClose, onSuccess }: Props) {
             <label className="block text-sm font-bold text-slate-700 mb-2">결제 금액</label>
             <div className="relative">
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={paidAmount}
-                onChange={e => setPaidAmount(e.target.value)}
+                onChange={e => {
+                  const raw = e.target.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+                  setPaidAmount(raw ? Number(raw).toLocaleString() : '');
+                }}
                 placeholder="0"
-                min={0}
-                max={balance}
                 className={`w-full px-4 py-3 border-2 rounded-xl text-right text-lg font-bold outline-none transition-all ${
                   isOverPayment ? 'border-red-400 bg-red-50' : 'border-slate-300 focus:border-emerald-500'
                 }`}
@@ -167,13 +169,13 @@ export default function PaymentModal({ invoice, onClose, onSuccess }: Props) {
           {/* 빠른 금액 선택 */}
           <div className="flex gap-2">
             <button
-              onClick={() => setPaidAmount(Math.round(balance / 2).toString())}
+              onClick={() => setPaidAmount(Math.round(balance / 2).toLocaleString())}
               className="flex-1 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors"
             >
               1/2 결제 ({Math.round(balance / 2).toLocaleString()}원)
             </button>
             <button
-              onClick={() => setPaidAmount(balance.toString())}
+              onClick={() => setPaidAmount(balance.toLocaleString())}
               className="flex-1 py-2 text-xs font-bold bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg transition-colors"
             >
               전액 결제 ({balance.toLocaleString()}원)

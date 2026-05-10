@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { X, FileText, Printer, Mail, Calculator, Upload, Camera, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { X, FileText, Printer, Mail, Calculator, Upload, Camera, Trash2, Loader2, Image as ImageIcon, MapPin, AlertCircle, Clock, StickyNote } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, updateDoc } from 'firebase/firestore';
 import { storage, db } from '@/lib/firebase';
-import { ProjectData } from '@/hooks/useProjects';
+import { ProjectData, ArSpotData, ExtraPhotoData } from '@/hooks/useProjects';
 import { sendReportEmail } from '@/lib/email';
 import InvoiceIssueModal from '@/components/InvoiceIssueModal';
 
@@ -209,8 +209,25 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, currentU
                     ) : (
                       <div className="grid grid-cols-2 gap-3">
                         {typePhotos.map(photo => (
-                          <div key={photo.storagePath} className="relative aspect-video rounded-xl overflow-hidden group bg-slate-800">
+                          <div key={photo.storagePath} className={`relative aspect-video rounded-xl overflow-hidden group bg-slate-800 border-2 transition-colors ${photo.isForceCaptured ? 'border-red-500/50 hover:border-red-500' : 'border-transparent hover:border-blue-500'}`}>
                             <img src={photo.url} alt={PHOTO_TYPE_LABELS[photo.type as PhotoType]} className="w-full h-full object-cover" />
+                            
+                            {/* 플랜 B: AR 스팟 및 강제 촬영 표기 */}
+                            <div className="absolute top-2 left-2 flex flex-col gap-1">
+                              {photo.arSpotName && (
+                                <div className="px-2 py-1 bg-black/70 backdrop-blur-md rounded border border-cyan-500/50 flex items-center gap-1 shadow-lg">
+                                  <MapPin size={10} className="text-cyan-400" />
+                                  <span className="text-[10px] text-cyan-100 font-bold">{photo.arSpotName}</span>
+                                </div>
+                              )}
+                              {photo.isForceCaptured && (
+                                <div className="px-2 py-1 bg-red-500/90 backdrop-blur-md rounded border border-red-400 flex items-center gap-1 shadow-lg shadow-red-500/30 animate-pulse">
+                                  <AlertCircle size={10} className="text-white" />
+                                  <span className="text-[10px] text-white font-bold">AR 이탈 (수동승인)</span>
+                                </div>
+                              )}
+                            </div>
+
                             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                             <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity">
                               <span className="text-xs text-white font-medium">
@@ -237,6 +254,95 @@ export default function ProjectDetailsModal({ project, isOpen, onClose, currentU
                   <div className="flex items-center gap-2 text-slate-400 text-sm">
                     <ImageIcon size={16} />
                     <span>위의 버튼을 눌러 작업 전/후/중 사진을 업로드하세요.</span>
+                  </div>
+                </div>
+              )}
+
+              {/* ── AR 현장 스팟 비교 뷰어 ── */}
+              {project.arSpots && Object.keys(project.arSpots).length > 0 && (
+                <div>
+                  <h3 className="text-base font-semibold text-white border-l-4 border-cyan-500 pl-3 mb-4 mt-2">
+                    AR 현장 스팟 ({Object.keys(project.arSpots).length}곳)
+                  </h3>
+                  <div className="space-y-4">
+                    {Object.entries(project.arSpots).map(([spotId, spot]: [string, ArSpotData]) => {
+                      let duration: string | null = null;
+                      if (spot.startedAt && spot.completedAt) {
+                        const totalMins = Math.round((spot.completedAt - spot.startedAt) / 60000);
+                        duration = totalMins >= 60
+                          ? `${Math.floor(totalMins / 60)}시간 ${totalMins % 60}분`
+                          : totalMins > 0 ? `${totalMins}분` : '1분 미만';
+                      }
+                      const photoSessions = [
+                        { url: spot.beforeUrl, label: '작업 전', color: '#0ea5e9' },
+                        { url: spot.duringUrl, label: '작업 중', color: '#f59e0b' },
+                        { url: spot.afterUrl,  label: '작업 후', color: '#10b981' },
+                      ];
+                      return (
+                        <div key={spotId} className="rounded-2xl border border-slate-700 overflow-hidden bg-slate-800/40">
+                          {/* 스팟 헤더 */}
+                          <div className="px-4 py-2.5 flex items-center gap-3 border-b border-slate-700/50 bg-slate-800/60">
+                            <MapPin size={13} className="text-cyan-400 shrink-0" />
+                            <span className="font-bold text-white text-sm">{spot.name}</span>
+                            {duration && (
+                              <span className="ml-auto flex items-center gap-1.5 text-xs text-amber-400 font-medium">
+                                <Clock size={11} /> {duration}
+                              </span>
+                            )}
+                          </div>
+                          {/* 사진 3분할 비교 */}
+                          <div className="grid grid-cols-3 divide-x divide-slate-700/50">
+                            {photoSessions.map(({ url, label, color }) => (
+                              <div key={label} className="relative">
+                                {url ? (
+                                  <a href={url} target="_blank" rel="noopener noreferrer" className="block">
+                                    <div className="aspect-square bg-slate-900 overflow-hidden">
+                                      <img src={url} alt={label}
+                                        className="w-full h-full object-cover hover:opacity-80 transition-opacity" />
+                                    </div>
+                                  </a>
+                                ) : (
+                                  <div className="aspect-square bg-slate-900 flex items-center justify-center">
+                                    <Camera size={22} style={{ color, opacity: 0.18 }} />
+                                  </div>
+                                )}
+                                <div className="absolute bottom-0 left-0 right-0 px-2 py-1"
+                                  style={{ background: 'linear-gradient(to top,rgba(0,0,0,0.75),transparent)' }}>
+                                  <span className="text-[10px] font-bold" style={{ color }}>{label}</span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {/* 현장 메모 */}
+                          {spot.note && (
+                            <div className="px-4 py-2.5 border-t border-slate-700/50 flex items-start gap-2">
+                              <StickyNote size={12} className="text-sky-400 shrink-0 mt-0.5" />
+                              <p className="text-xs text-slate-300">{spot.note}</p>
+                            </div>
+                          )}
+                          {/* 추가 작업 사진 */}
+                          {spot.extraPhotos && spot.extraPhotos.length > 0 && (
+                            <div className="px-4 py-3 border-t border-slate-700/50">
+                              <div className="flex items-center gap-2 mb-2">
+                                <ImageIcon size={12} className="text-slate-400" />
+                                <span className="text-xs text-slate-400 font-semibold">
+                                  추가 작업 사진 ({spot.extraPhotos.length}장)
+                                </span>
+                              </div>
+                              <div className="grid grid-cols-4 gap-1.5">
+                                {spot.extraPhotos.filter((ep: ExtraPhotoData) => ep.url).map((ep: ExtraPhotoData) => (
+                                  <a key={ep.id} href={ep.url} target="_blank" rel="noopener noreferrer"
+                                    className="block aspect-square rounded-lg overflow-hidden bg-slate-900 hover:opacity-80 transition-opacity">
+                                    <img src={ep.url} alt="추가 작업 사진"
+                                      className="w-full h-full object-cover" />
+                                  </a>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

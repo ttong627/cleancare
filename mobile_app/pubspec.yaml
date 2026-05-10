@@ -1,8 +1,8 @@
 name: mobile_app
-description: "Clean Care Mobile App for Field Workers"
+description: "크린케어시스템 현장팀 모바일 앱"
 publish_to: 'none'
 
-version: 1.0.4+1
+version: 1.1.20+22
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
@@ -11,37 +11,61 @@ dependencies:
   flutter:
     sdk: flutter
   
-  # Firebase Core & Auth & Firestore
+  # Firebase Core & Auth & Firestore & Storage
   firebase_core: ^2.27.0
   firebase_auth: ^4.17.6
   cloud_firestore: ^4.15.6
+  firebase_storage: ^11.7.6
+
+  # 로컬 파일 경로
+  path_provider: ^2.1.2
 
   # AR & Camera
   camera: ^0.10.5+9
-  ar_flutter_plugin: ^0.7.3 # ARKit / ARCore plugin
 
   # State Management & Utils
   provider: ^6.1.2
   shared_preferences: ^2.2.2
   
-  # Offline Database (Isar)
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
+
+  # TTS & 편의 기능
+  flutter_tts: ^3.8.5
+  screen_brightness: ^0.2.2+1
+
+  # Image compression
+  flutter_image_compress: ^2.1.0
+
+  # Sensors (gyroscope for floor plan scan)
+  sensors_plus: ^3.1.0
 
   # UI Libraries
   cupertino_icons: ^1.0.6
   geolocator: ^9.0.2
   http: ^1.6.0
   url_launcher: ^6.3.2
+  permission_handler: ^10.4.5
+  package_info_plus: ^8.0.0
+  geocoding: ^3.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  isar_generator: ^3.1.0+1
   build_runner: ^2.4.8
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/pa.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/images/pa.png"
+  min_sdk_android: 24
+  web:
+    generate: false
 
 flutter:
   uses-material-design: true
   assets:
     - assets/images/logo1.png
+    - assets/images/pa.png

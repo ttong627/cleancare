@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>크린케어시스템 사용설명서</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif; background: #f0f4f8; color: #1e293b; line-height: 1.6; }
+  .cover { background: linear-gradient(135deg, #0ea5e9 0%, #6366f1 100%); color: white; text-align: center; padding: 80px 40px; }
+  .cover h1 { font-size: 42px; font-weight: 900; margin-bottom: 12px; text-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+  .cover p { font-size: 18px; opacity: 0.9; margin-bottom: 8px; }
+  .cover .badge { display: inline-block; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; padding: 6px 20px; font-size: 14px; margin-top: 20px; }
+  .toc { background: white; max-width: 900px; margin: 40px auto; border-radius: 20px; padding: 40px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+  .toc h2 { font-size: 22px; color: #0ea5e9; margin-bottom: 24px; border-bottom: 2px solid #e0f2fe; padding-bottom: 12px; }
+  .toc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .toc-section { padding: 16px 20px; border-radius: 12px; border: 1px solid #e2e8f0; }
+  .toc-section.pc { border-left: 4px solid #0ea5e9; }
+  .toc-section.mobile { border-left: 4px solid #10b981; }
+  .toc-section h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+  .toc-section.pc h3 { color: #0ea5e9; }
+  .toc-section.mobile h3 { color: #10b981; }
+  .toc-section ul { list-style: none; }
+  .toc-section ul li { font-size: 13px; color: #475569; padding: 3px 0; }
+  .toc-section ul li::before { content: '▸ '; color: #94a3b8; }
+  .section { max-width: 900px; margin: 0 auto 48px; padding: 0 20px; }
+  .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 32px; padding: 24px 32px; border-radius: 20px; color: white; }
+  .section-header.pc { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+  .section-header.mobile { background: linear-gradient(135deg, #10b981, #0ea5e9); }
+  .section-header h2 { font-size: 26px; font-weight: 900; }
+  .section-header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+  .section-num { width: 56px; height: 56px; background: rgba(255,255,255,0.25); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 900; flex-shrink: 0; }
+  .step-card { background: white; border-radius: 16px; padding: 28px 32px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #f1f5f9; }
+  .step-card h3 { font-size: 17px; font-weight: 800; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .step-num { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 900; color: white; flex-shrink: 0; }
+  .step-num.pc { background: #0ea5e9; }
+  .step-num.mo { background: #10b981; }
+  .step-layout { display: grid; grid-template-columns: 1fr 280px; gap: 28px; align-items: start; }
+  .step-layout.reverse { grid-template-columns: 280px 1fr; }
+  .step-layout.reverse .step-desc { order: 2; }
+  .step-layout.reverse .step-img { order: 1; }
+  .step-desc ul { list-style: none; }
+  .step-desc ul li { padding: 8px 0; border-bottom: 1px solid #f8fafc; font-size: 14px; color: #334155; display: flex; gap: 10px; align-items: flex-start; }
+  .step-desc ul li:last-child { border-bottom: none; }
+  .step-desc ul li .icon { color: #0ea5e9; font-weight: 700; flex-shrink: 0; }
+  .step-desc ul li.green .icon { color: #10b981; }
+  .step-desc ul li.orange .icon { color: #f59e0b; }
+  .step-desc ul li.red .icon { color: #ef4444; }
+  .tip-box { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 10px; padding: 14px 18px; margin-top: 16px; font-size: 13px; color: #0369a1; }
+  .tip-box strong { display: block; margin-bottom: 4px; }
+  .warn-box { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 10px; padding: 14px 18px; margin-top: 16px; font-size: 13px; color: #c2410c; }
+  .step-img { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .step-img p { font-size: 12px; color: #64748b; text-align: center; }
+  svg text { font-family: 'Malgun Gothic', sans-serif; }
+  .flow-chart { background: white; border-radius: 16px; padding: 28px; margin-bottom: 24px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .flow-chart h3 { font-size: 16px; font-weight: 700; color: #334155; margin-bottom: 20px; }
+  .flow-row { display: flex; align-items: center; gap: 0; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 8px; }
+  .flow-item { display: flex; flex-direction: column; align-items: center; gap: 6px; flex-shrink: 0; }
+  .flow-box { padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center; white-space: nowrap; }
+  .flow-box.blue { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+  .flow-box.green { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
+  .flow-box.orange { background: #fff7ed; color: #92400e; border: 1px solid #fcd34d; }
+  .flow-box.purple { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+  .flow-box.teal { background: #ccfbf1; color: #0f766e; border: 1px solid #5eead4; }
+  .flow-box.red { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+  .flow-arrow { font-size: 20px; color: #94a3b8; margin: 0 6px; flex-shrink: 0; }
+  .flow-label { font-size: 10px; color: #64748b; }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, #e2e8f0, transparent); margin: 48px 0; }
+  .approval-notice { background: linear-gradient(135deg, #fef9c3, #fef3c7); border: 1px solid #fde68a; border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+  .approval-notice h4 { color: #92400e; font-size: 15px; margin-bottom: 8px; }
+  .approval-notice p { color: #78350f; font-size: 13px; }
+  @media (max-width: 700px) {
+    .step-layout, .step-layout.reverse { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .step-layout.reverse .step-desc { order: 1; }
+    .step-layout.reverse .step-img { order: 2; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 표지 -->
+<div class="cover">
+  <div style="font-size:60px;margin-bottom:16px;">🧹</div>
+  <h1>크린케어시스템</h1>
+  <p>PC 관리자 · 모바일 현장팀 통합 사용설명서</p>
+  <p style="opacity:0.7;font-size:14px;">CleanCare System v1.0.4</p>
+  <div class="badge">최종 업데이트: 2026년 5월</div>
+</div>
+
+<!-- 목차 -->
+<div class="toc">
+  <h2>📋 목차</h2>
+  <div class="toc-grid">
+    <div class="toc-section pc">
+      <h3>🖥️ PC 관리자 메뉴얼</h3>
+      <ul>
+        <li>1. 로그인 / 회원가입</li>
+        <li>2. 대시보드 — 통합 관제센터</li>
+        <li>3. 작업 배정 (캘린더 + 지도)</li>
+        <li>4. 작업자 관리</li>
+        <li>5. 사용자(고객) 관리</li>
+        <li>6. 결제 · 정산</li>
+        <li>7. 보고서</li>
+        <li>8. 팩스 발송</li>
+        <li>9. 설정</li>
+      </ul>
+    </div>
+    <div class="toc-section mobile">
+      <h3>📱 모바일 현장팀 메뉴얼</h3>
+      <ul>
+        <li>1. 앱 설치</li>
+        <li>2. 로그인</li>
+        <li>3. 현장 목록 확인</li>
+        <li>4. 작업 시작 — 도면 촬영</li>
+        <li>5. 촬영 장소 지정</li>
+        <li>6. 작업 전 · 중 · 후 사진 촬영</li>
+        <li>7. 감독자 승인 시스템</li>
+        <li>8. 편의 기능 안내</li>
+        <li>9. 오프라인 모드</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PC 관리자 메뉴얼
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header pc">
+    <div class="section-num">PC</div>
+    <div>
+      <h2>PC 관리자 메뉴얼</h2>
+      <p>웹 브라우저에서 접속하는 관리자 전용 시스템입니다</p>
+    </div>
+  </div>
+
+  <!-- PC 1. 로그인 -->
+  <div class="step-card">
+    <h3><span class="step-num pc">1</span>로그인 / 회원가입</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">🌐</span>브라우저 주소창에 <strong>시스템 URL</strong>을 입력하거나 북마크를 클릭합니다.</li>
+          <li><span class="icon">📧</span><strong>이메일 주소</strong>와 <strong>비밀번호</strong>를 입력 후 <em>로그인</em> 버튼을 누릅니다.</li>
+          <li><span class="icon green">✅</span>최초 사용 시 <em>회원가입</em>을 클릭하여 관리자 계정을 생성합니다.</li>
+          <li><span class="icon green">✅</span>로그인 후 자동으로 <strong>대시보드</strong>로 이동합니다.</li>
+          <li><span class="icon orange">⚠️</span>비밀번호는 6자 이상으로 설정해 주세요.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 Tip</strong>
+          브라우저의 "비밀번호 저장" 기능을 활용하면 다음 접속 시 자동 입력됩니다.
+        </div>
+      </div>
+      <div class="step-img">
+        <!-- 로그인 화면 SVG -->
+        <svg width="260" height="320" viewBox="0 0 260 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="260" height="320" rx="16" fill="#f8fafc"/>
+          <rect x="0" y="0" width="260" height="60" rx="16" fill="url(#grad1)"/>
+          <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="260" y2="60" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#0ea5e9"/>
+              <stop offset="100%" stop-color="#6366f1"/>
+            </linearGradient>
+          </defs>
+          <text x="130" y="30" text-anchor="middle" fill="white" font-size="13" font-weight="700">🧹 크린케어시스템</text>
+          <text x="130" y="50" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10">관리자 로그인</text>
+          <text x="30" y="100" fill="#334155" font-size="11" font-weight="600">이메일</text>
+          <rect x="30" y="108" width="200" height="36" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="44" y="131" fill="#94a3b8" font-size="11">admin@example.com</text>
+          <text x="30" y="165" fill="#334155" font-size="11" font-weight="600">비밀번호</text>
+          <rect x="30" y="173" width="200" height="36" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1.5"/>
+          <text x="44" y="196" fill="#94a3b8" font-size="11">••••••••</text>
+          <rect x="30" y="228" width="200" height="40" rx="10" fill="url(#grad1)"/>
+          <text x="130" y="254" text-anchor="middle" fill="white" font-size="13" font-weight="700">로그인</text>
+          <text x="130" y="294" text-anchor="middle" fill="#0ea5e9" font-size="11">계정이 없으신가요? 회원가입</text>
+        </svg>
+        <p>로그인 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC 2. 대시보드 -->
+  <div class="step-card">
+    <h3><span class="step-num pc">2</span>대시보드 — 통합 관제센터</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">📊</span>상단 3개 카드에서 <strong>긴급 조치 / 진행 중 / 완료</strong> 현장 수를 즉시 확인합니다.</li>
+          <li><span class="icon red">🚨</span><strong>긴급 조치 필요</strong>(빨간색) 현장은 가장 먼저 확인해야 합니다.</li>
+          <li><span class="icon">🔍</span>상단 검색창에서 <em>현장명, 작업자명, 반려 사유</em>로 빠르게 검색합니다.</li>
+          <li><span class="icon green">🗺️</span><strong>지도 관제</strong> 버튼을 클릭하면 카카오맵 위에서 현장 위치와 작업자 GPS를 실시간으로 봅니다.</li>
+          <li><span class="icon">📋</span>각 현장 행의 <em>상세 보기 및 정산</em> 버튼 → 사진·정산 정보를 확인합니다.</li>
+          <li><span class="icon green">✅</span><em>완료 처리</em> 버튼으로 작업을 완료 상태로 변경합니다.</li>
+          <li><span class="icon">☀️</span>우측 상단 날씨 위젯이 현재 기상 정보를 표시합니다.</li>
+        </ul>
+        <div class="warn-box">
+          ⚠️ <strong>DB 전체 삭제</strong> 버튼은 모든 데이터를 영구 삭제합니다. 절대 실수로 누르지 않도록 주의하세요.
+        </div>
+      </div>
+      <div class="step-img">
+        <!-- 대시보드 SVG -->
+        <svg width="260" height="360" viewBox="0 0 260 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="260" height="360" rx="12" fill="#f0f4f8"/>
+          <!-- header -->
+          <rect x="0" y="0" width="260" height="44" rx="12" fill="url(#grad1)"/>
+          <text x="14" y="27" fill="white" font-size="12" font-weight="800">크린케어 통합 관제센터</text>
+          <text x="200" y="27" fill="rgba(255,255,255,0.8)" font-size="9">☀️ 22°C</text>
+          <!-- stat cards -->
+          <rect x="8" y="52" width="75" height="56" rx="10" fill="white" stroke="rgba(239,68,68,0.3)" stroke-width="1"/>
+          <text x="20" y="70" fill="#ef4444" font-size="9" font-weight="700">긴급 조치</text>
+          <text x="20" y="90" fill="#0f172a" font-size="22" font-weight="900">2</text>
+          <text x="52" y="90" fill="#94a3b8" font-size="10">건</text>
+          <rect x="92" y="52" width="75" height="56" rx="10" fill="white" stroke="rgba(14,165,233,0.3)" stroke-width="1"/>
+          <text x="104" y="70" fill="#0ea5e9" font-size="9" font-weight="700">진행 중</text>
+          <text x="104" y="90" fill="#0f172a" font-size="22" font-weight="900">5</text>
+          <text x="136" y="90" fill="#94a3b8" font-size="10">건</text>
+          <rect x="176" y="52" width="76" height="56" rx="10" fill="white" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+          <text x="186" y="70" fill="#10b981" font-size="9" font-weight="700">오늘 완료</text>
+          <text x="186" y="90" fill="#0f172a" font-size="22" font-weight="900">8</text>
+          <text x="218" y="90" fill="#94a3b8" font-size="10">건</text>
+          <!-- search -->
+          <rect x="8" y="118" width="244" height="28" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="24" y="136" fill="#94a3b8" font-size="10">🔍  현장명, 작업자 검색...</text>
+          <!-- 긴급 섹션 -->
+          <text x="8" y="162" fill="#ef4444" font-size="10" font-weight="700">🚨 긴급 조치 필요 현장  2</text>
+          <rect x="8" y="168" width="244" height="50" rx="10" fill="white" stroke="rgba(239,68,68,0.2)" stroke-width="1"/>
+          <rect x="16" y="178" width="32" height="32" rx="8" fill="rgba(239,68,68,0.1)"/>
+          <text x="32" y="198" text-anchor="middle" fill="#ef4444" font-size="14">📍</text>
+          <text x="56" y="186" fill="#0f172a" font-size="11" font-weight="700">강남구 현장</text>
+          <text x="56" y="200" fill="#64748b" font-size="9">작업자: 홍길동 | 도면 불일치</text>
+          <rect x="174" y="175" width="70" height="22" rx="6" fill="url(#grad1)"/>
+          <text x="209" y="191" text-anchor="middle" fill="white" font-size="9" font-weight="700">강제 재시작</text>
+          <!-- 진행중 섹션 -->
+          <text x="8" y="234" fill="#0ea5e9" font-size="10" font-weight="700">⏳ 현재 진행 중인 현장  5</text>
+          <rect x="8" y="240" width="244" height="50" rx="10" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <rect x="16" y="250" width="32" height="32" rx="8" fill="rgba(14,165,233,0.1)"/>
+          <text x="32" y="270" text-anchor="middle" fill="#0ea5e9" font-size="14">📍</text>
+          <text x="56" y="258" fill="#0f172a" font-size="11" font-weight="700">서초구 현장</text>
+          <text x="56" y="272" fill="#64748b" font-size="9">작업자: 김철수</text>
+          <rect x="152" y="247" width="54" height="22" rx="6" fill="rgba(255,255,255,0.9)" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="179" y="263" text-anchor="middle" fill="#334155" font-size="8">상세보기</text>
+          <rect x="212" y="247" width="34" height="22" rx="6" fill="#10b981"/>
+          <text x="229" y="263" text-anchor="middle" fill="white" font-size="8" font-weight="700">완료</text>
+          <!-- view toggle -->
+          <rect x="8" y="302" width="120" height="28" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+          <rect x="10" y="304" width="58" height="24" rx="6" fill="url(#grad1)"/>
+          <text x="39" y="321" text-anchor="middle" fill="white" font-size="10" font-weight="700">리스트 뷰</text>
+          <text x="97" y="321" text-anchor="middle" fill="#475569" font-size="10">지도 관제</text>
+          <!-- map preview -->
+          <rect x="8" y="336" width="244" height="18" rx="6" fill="#d1fae5"/>
+          <text x="130" y="349" text-anchor="middle" fill="#065f46" font-size="9" font-weight="700">● DB Live — 실시간 연결 중</text>
+        </svg>
+        <p>대시보드 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC 3. 작업 배정 -->
+  <div class="step-card">
+    <h3><span class="step-num pc">3</span>작업 배정 (캘린더 + 지도)</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">📅</span>좌측 메뉴에서 <strong>작업 배정</strong>을 클릭합니다.</li>
+          <li><span class="icon">➕</span>우측 상단 <em>+ 새 작업 배정</em> 버튼 → 작업 정보를 입력합니다.</li>
+          <li><span class="icon">📝</span>입력 항목: 현장명, 날짜, 담당 작업자, 주소, 담당자, 연락처, 사진 요구사항, 메모</li>
+          <li><span class="icon">👤</span>고객(Client)을 선택하면 주소가 자동 입력됩니다.</li>
+          <li><span class="icon green">🗺️</span><strong>지도 보기</strong> 탭 → 배정된 현장 위치를 카카오맵에서 확인합니다.</li>
+          <li><span class="icon">📆</span>캘린더에서 날짜를 클릭하면 해당일 작업 목록을 표시합니다.</li>
+          <li><span class="icon green">📅</span>구글 캘린더 이메일이 등록된 작업자에게 <strong>자동 일정 초대</strong>가 발송됩니다.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 Tip</strong>
+          작업자 등록 시 구글 이메일을 입력해 두면 배정 즉시 구글 캘린더에 일정이 추가됩니다.
+        </div>
+      </div>
+      <div class="step-img">
+        <!-- 캘린더 SVG -->
+        <svg width="260" height="300" viewBox="0 0 260 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="260" height="300" rx="12" fill="#f8fafc"/>
+          <rect x="0" y="0" width="260" height="40" rx="12" fill="url(#grad1)"/>
+          <text x="14" y="25" fill="white" font-size="12" font-weight="800">📅 작업 배정</text>
+          <rect x="192" y="8" width="60" height="24" rx="8" fill="rgba(255,255,255,0.25)"/>
+          <text x="222" y="25" text-anchor="middle" fill="white" font-size="10" font-weight="700">+ 새 배정</text>
+          <!-- calendar header -->
+          <text x="130" y="64" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="700">◀  2026년 5월  ▶</text>
+          <!-- day headers -->
+          <text x="20" y="84" fill="#94a3b8" font-size="9">일</text>
+          <text x="52" y="84" fill="#94a3b8" font-size="9">월</text>
+          <text x="84" y="84" fill="#94a3b8" font-size="9">화</text>
+          <text x="116" y="84" fill="#94a3b8" font-size="9">수</text>
+          <text x="148" y="84" fill="#94a3b8" font-size="9">목</text>
+          <text x="180" y="84" fill="#94a3b8" font-size="9">금</text>
+          <text x="212" y="84" fill="#94a3b8" font-size="9">토</text>
+          <!-- calendar rows -->
+          <text x="20" y="104" fill="#334155" font-size="10">1</text>
+          <text x="52" y="104" fill="#334155" font-size="10">2</text>
+          <text x="84" y="104" fill="#334155" font-size="10">3</text>
+          <text x="116" y="104" fill="#334155" font-size="10">4</text>
+          <text x="148" y="104" fill="#334155" font-size="10">5</text>
+          <text x="180" y="104" fill="#334155" font-size="10">6</text>
+          <text x="212" y="104" fill="#334155" font-size="10">7</text>
+          <rect x="14" y="112" width="24" height="18" rx="4" fill="rgba(14,165,233,0.12)"/>
+          <text x="20" y="125" fill="#0ea5e9" font-size="9">강남</text>
+          <text x="52" y="124" fill="#334155" font-size="10">9</text>
+          <rect x="78" y="112" width="24" height="18" rx="4" fill="rgba(16,185,129,0.12)"/>
+          <text x="84" y="125" fill="#10b981" font-size="9">서초</text>
+          <text x="116" y="124" fill="#334155" font-size="10">11</text>
+          <text x="148" y="124" fill="#334155" font-size="10">12</text>
+          <text x="180" y="124" fill="#334155" font-size="10">13</text>
+          <text x="212" y="124" fill="#334155" font-size="10">14</text>
+          <!-- selected day detail -->
+          <rect x="14" y="148" width="30" height="30" rx="8" fill="url(#grad1)"/>
+          <text x="29" y="168" text-anchor="middle" fill="white" font-size="12" font-weight="900">10</text>
+          <text x="52" y="160" fill="#334155" font-size="10">16</text>
+          <!-- job list for selected day -->
+          <rect x="8" y="192" width="244" height="40" rx="8" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <text x="20" y="208" fill="#0f172a" font-size="11" font-weight="700">강남구 현장</text>
+          <text x="20" y="224" fill="#64748b" font-size="9">작업자: 홍길동 | 2026-05-10</text>
+          <rect x="200" y="198" width="44" height="24" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.3)" stroke-width="1"/>
+          <text x="222" y="215" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="700">수정</text>
+          <rect x="8" y="238" width="244" height="40" rx="8" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <text x="20" y="254" fill="#0f172a" font-size="11" font-weight="700">서초구 현장</text>
+          <text x="20" y="270" fill="#64748b" font-size="9">작업자: 김철수 | 2026-05-10</text>
+          <rect x="200" y="244" width="44" height="24" rx="6" fill="rgba(239,68,68,0.1)" stroke="rgba(239,68,68,0.3)" stroke-width="1"/>
+          <text x="222" y="261" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="700">수정</text>
+        </svg>
+        <p>작업 배정 캘린더</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC 4. 작업자 관리 -->
+  <div class="step-card">
+    <h3><span class="step-num pc">4</span>작업자 관리</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">👥</span>좌측 메뉴 <strong>작업자 관리</strong> → 전체 현장 직원 목록을 관리합니다.</li>
+          <li><span class="icon">➕</span><em>+ 작업자 추가</em> → 이름, 직책, 전화번호, 구글 이메일, 상태를 입력합니다.</li>
+          <li><span class="icon">🟢</span>상태: <em>작업 중 / 대기(온라인) / 오프라인</em> 3가지로 구분됩니다.</li>
+          <li><span class="icon">✏️</span>행 우측 <em>수정</em> 버튼으로 정보를 편집합니다.</li>
+          <li><span class="icon red">🗑️</span><em>삭제</em> 버튼은 확인 후 영구 삭제됩니다.</li>
+          <li><span class="icon green">📧</span><strong>구글 이메일 등록 시</strong>: 작업 배정 때 캘린더 초대 자동 발송</li>
+        </ul>
+      </div>
+      <div class="step-img">
+        <svg width="260" height="260" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="260" height="260" rx="12" fill="#f8fafc"/>
+          <rect x="0" y="0" width="260" height="40" rx="12" fill="#1e293b"/>
+          <text x="14" y="25" fill="white" font-size="12" font-weight="800">👥 작업자 관리</text>
+          <rect x="194" y="8" width="58" height="24" rx="8" fill="url(#grad1)"/>
+          <text x="223" y="25" text-anchor="middle" fill="white" font-size="10" font-weight="700">+ 추가</text>
+          <!-- search -->
+          <rect x="8" y="50" width="244" height="26" rx="7" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+          <text x="22" y="68" fill="#94a3b8" font-size="10">🔍  작업자 검색...</text>
+          <!-- worker rows -->
+          <rect x="8" y="84" width="244" height="50" rx="10" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <circle cx="34" cy="109" r="16" fill="rgba(14,165,233,0.1)"/>
+          <text x="34" y="114" text-anchor="middle" fill="#0ea5e9" font-size="14">👤</text>
+          <text x="58" y="103" fill="#0f172a" font-size="11" font-weight="700">홍길동</text>
+          <text x="58" y="117" fill="#64748b" font-size="9">청소반장 | 010-1234-5678</text>
+          <rect x="136" y="95" width="44" height="18" rx="6" fill="rgba(59,130,246,0.1)" stroke="rgba(59,130,246,0.3)" stroke-width="1"/>
+          <text x="158" y="108" text-anchor="middle" fill="#2563eb" font-size="9" font-weight="700">작업 중</text>
+          <rect x="184" y="95" width="30" height="18" rx="5" fill="rgba(14,165,233,0.1)"/>
+          <text x="199" y="108" text-anchor="middle" fill="#0ea5e9" font-size="9">수정</text>
+          <rect x="218" y="95" width="26" height="18" rx="5" fill="rgba(239,68,68,0.1)"/>
+          <text x="231" y="108" text-anchor="middle" fill="#ef4444" font-size="9">삭제</text>
+
+          <rect x="8" y="140" width="244" height="50" rx="10" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <circle cx="34" cy="165" r="16" fill="rgba(16,185,129,0.1)"/>
+          <text x="34" y="170" text-anchor="middle" fill="#10b981" font-size="14">👤</text>
+          <text x="58" y="159" fill="#0f172a" font-size="11" font-weight="700">김철수</text>
+          <text x="58" y="173" fill="#64748b" font-size="9">현장팀원 | 010-9876-5432</text>
+          <rect x="136" y="151" width="44" height="18" rx="6" fill="rgba(16,185,129,0.1)" stroke="rgba(16,185,129,0.3)" stroke-width="1"/>
+          <text x="158" y="164" text-anchor="middle" fill="#059669" font-size="9" font-weight="700">온라인</text>
+          <rect x="184" y="151" width="30" height="18" rx="5" fill="rgba(14,165,233,0.1)"/>
+          <text x="199" y="164" text-anchor="middle" fill="#0ea5e9" font-size="9">수정</text>
+          <rect x="218" y="151" width="26" height="18" rx="5" fill="rgba(239,68,68,0.1)"/>
+          <text x="231" y="164" text-anchor="middle" fill="#ef4444" font-size="9">삭제</text>
+
+          <rect x="8" y="196" width="244" height="50" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+          <circle cx="34" cy="221" r="16" fill="#f1f5f9"/>
+          <text x="34" y="226" text-anchor="middle" fill="#94a3b8" font-size="14">👤</text>
+          <text x="58" y="215" fill="#0f172a" font-size="11" font-weight="700">이영희</text>
+          <text x="58" y="229" fill="#64748b" font-size="9">현장팀원 | 010-5555-1234</text>
+          <rect x="136" y="207" width="44" height="18" rx="6" fill="rgba(100,116,139,0.1)" stroke="rgba(100,116,139,0.3)" stroke-width="1"/>
+          <text x="158" y="220" text-anchor="middle" fill="#475569" font-size="9" font-weight="700">오프라인</text>
+          <rect x="184" y="207" width="30" height="18" rx="5" fill="rgba(14,165,233,0.1)"/>
+          <text x="199" y="220" text-anchor="middle" fill="#0ea5e9" font-size="9">수정</text>
+          <rect x="218" y="207" width="26" height="18" rx="5" fill="rgba(239,68,68,0.1)"/>
+          <text x="231" y="220" text-anchor="middle" fill="#ef4444" font-size="9">삭제</text>
+        </svg>
+        <p>작업자 관리 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PC 5-9 요약 -->
+  <div class="step-card">
+    <h3><span class="step-num pc">5</span>사용자·정산·보고서·팩스·설정</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
+        <div style="font-size:15px;font-weight:700;color:#0ea5e9;margin-bottom:8px;">👤 사용자(고객) 관리</div>
+        <p style="font-size:13px;color:#475569;">고객사 정보(이름·주소·담당자·연락처)를 등록하면 작업 배정 시 자동 불러옵니다. 좌측 메뉴 <strong>사용자 관리</strong>에서 추가·수정·삭제합니다.</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
+        <div style="font-size:15px;font-weight:700;color:#10b981;margin-bottom:8px;">💰 결제·정산</div>
+        <p style="font-size:13px;color:#475569;">현장 상세 팝업에서 금액·VAT 여부를 입력 → 세금계산서·명세서를 PDF로 출력합니다. <strong>월별 매출 차트</strong>도 함께 확인됩니다.</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
+        <div style="font-size:15px;font-weight:700;color:#f59e0b;margin-bottom:8px;">📊 보고서</div>
+        <p style="font-size:13px;color:#475569;">기간별 작업 현황·완료율·매출 통계를 조회합니다. 좌측 메뉴 <strong>보고서</strong>에서 접근합니다.</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:16px;border:1px solid #e2e8f0;">
+        <div style="font-size:15px;font-weight:700;color:#6366f1;margin-bottom:8px;">📠 팩스 발송</div>
+        <p style="font-size:13px;color:#475569;">좌측 메뉴 <strong>팩스</strong>에서 고객사로 문서를 전송합니다. 수신 번호와 문서 내용을 입력 후 발송합니다.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════════════════════════════════════
+     모바일 메뉴얼
+═══════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-header mobile">
+    <div class="section-num">📱</div>
+    <div>
+      <h2>모바일 현장팀 메뉴얼</h2>
+      <p>갤럭시 안드로이드 스마트폰에서 사용하는 현장 촬영 앱입니다</p>
+    </div>
+  </div>
+
+  <!-- 전체 작업 흐름 -->
+  <div class="flow-chart">
+    <h3>📌 전체 작업 흐름 (12단계)</h3>
+    <div class="flow-row">
+      <div class="flow-item"><div class="flow-box blue">① 도면 촬영</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box purple">② 감독자 승인</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box blue">③ 장소 지정</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box purple">④ 감독자 승인</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box green">⑤ 작업전 촬영</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box purple">⑥ 감독자 승인</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box orange">⑦ 작업중 촬영</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box purple">⑧ 감독자 승인</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box teal">⑨ 작업후 촬영</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box purple">⑩ 최종 승인</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-item"><div class="flow-box green">✅ 완료</div></div>
+    </div>
+    <p style="font-size:12px;color:#64748b;margin-top:12px;">각 촬영 단계마다 AI 유사도 검사 후 감독자가 4자리 승인 코드를 입력해야 다음 단계로 진행됩니다.</p>
+  </div>
+
+  <!-- 모바일 1. 앱 설치 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">1</span>앱 설치</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">📲</span>갤럭시 기본 브라우저(삼성 인터넷)에서 아래 URL을 입력합니다.</li>
+          <li style="background:#f0fdf4;border-radius:8px;padding:10px 12px;font-size:13px;font-family:monospace;border:1px solid #bbf7d0;">
+            <span class="icon green">🔗</span>https://storage.googleapis.com/<br>cleancare-cf307.firebasestorage.app/<br>apk/cleancaresystem.apk
+          </li>
+          <li><span class="icon">⬇️</span>APK 파일이 다운로드되면 <em>열기</em>를 탭합니다.</li>
+          <li><span class="icon orange">⚠️</span><strong>출처를 알 수 없는 앱 설치</strong> 경고가 뜨면 <em>설정 → 이 소스 허용</em>을 활성화합니다.</li>
+          <li><span class="icon green">✅</span><em>설치</em> 버튼을 탭하면 홈 화면에 <strong>크린케어시스템</strong> 아이콘이 생깁니다.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 QR 코드로 설치 (더 쉬운 방법)</strong>
+          관리자가 qr.io에서 위 URL로 QR 코드를 만들어 인쇄해 두면, 갤럭시 카메라로 QR 스캔 → 바로 다운로드됩니다.
+        </div>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="260" viewBox="0 0 140 260" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="256" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="224" rx="12" fill="white"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- app icon -->
+          <rect x="34" y="60" width="72" height="72" rx="18" fill="url(#grad1)"/>
+          <text x="70" y="104" text-anchor="middle" fill="white" font-size="32">🧹</text>
+          <text x="70" y="152" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">크린케어시스템</text>
+          <text x="70" y="168" text-anchor="middle" fill="#64748b" font-size="9">v1.0.4</text>
+          <!-- install button -->
+          <rect x="24" y="186" width="92" height="30" rx="8" fill="url(#grad1)"/>
+          <text x="70" y="206" text-anchor="middle" fill="white" font-size="12" font-weight="700">설치</text>
+          <text x="70" y="230" text-anchor="middle" fill="#94a3b8" font-size="9">49.1MB</text>
+        </svg>
+        <p>앱 설치 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 2. 현장 목록 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">2</span>로그인 · 현장 목록</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">🔐</span>앱을 열면 <strong>로그인 화면</strong>이 나타납니다. 관리자에게 받은 계정으로 로그인합니다.</li>
+          <li><span class="icon">📋</span>로그인 후 <strong>오늘 배정된 현장 목록</strong>이 표시됩니다.</li>
+          <li><span class="icon">📍</span>현장 카드에는 현장명, 주소, 작업 상태가 표시됩니다.</li>
+          <li><span class="icon green">▶️</span>현장 카드를 탭하면 <strong>작업 시작</strong> 화면으로 이동합니다.</li>
+          <li><span class="icon">🗺️</span>우측 하단 노란색 <strong>카카오 내비</strong> 버튼을 탭하면 현장까지 길 안내가 시작됩니다.</li>
+        </ul>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#f0f4f8"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- header -->
+          <rect x="8" y="16" width="124" height="44" rx="12" fill="url(#grad1)"/>
+          <text x="70" y="33" text-anchor="middle" fill="white" font-size="10" font-weight="800">크린케어시스템</text>
+          <text x="70" y="50" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="8">오늘 배정 현장: 2건</text>
+          <!-- job cards -->
+          <rect x="14" y="68" width="112" height="64" rx="10" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <text x="24" y="84" fill="#0f172a" font-size="10" font-weight="700">강남구 현장</text>
+          <text x="24" y="96" fill="#64748b" font-size="8">📍 서울 강남구 테헤란로 123</text>
+          <text x="24" y="108" fill="#0ea5e9" font-size="8">● 진행 중</text>
+          <rect x="82" y="94" width="36" height="22" rx="6" fill="url(#grad1)"/>
+          <text x="100" y="109" text-anchor="middle" fill="white" font-size="9" font-weight="700">시작</text>
+
+          <rect x="14" y="140" width="112" height="64" rx="10" fill="white" stroke="rgba(14,165,233,0.2)" stroke-width="1"/>
+          <text x="24" y="156" fill="#0f172a" font-size="10" font-weight="700">서초구 현장</text>
+          <text x="24" y="168" fill="#64748b" font-size="8">📍 서울 서초구 반포대로 55</text>
+          <text x="24" y="180" fill="#94a3b8" font-size="8">● 대기 중</text>
+          <rect x="82" y="166" width="36" height="22" rx="6" fill="#e2e8f0"/>
+          <text x="100" y="181" text-anchor="middle" fill="#94a3b8" font-size="9" font-weight="700">대기</text>
+          <!-- kakao nav fab -->
+          <circle cx="110" cy="230" r="16" fill="#FEE500" stroke="white" stroke-width="2"/>
+          <text x="110" y="235" text-anchor="middle" font-size="12">🗺️</text>
+        </svg>
+        <p>현장 목록 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 3. 도면 촬영 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">3</span>1단계: 도면 촬영</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">📸</span>카메라가 자동으로 켜집니다. 작업장 <strong>도면(설계도)</strong>을 화면 안에 맞게 촬영합니다.</li>
+          <li><span class="icon">🎙️</span>음성 안내: <em>"도면을 촬영해 주세요"</em></li>
+          <li><span class="icon green">🔘</span>하단 큰 흰색 원형 버튼(셔터) 또는 <strong>볼륨 버튼</strong>을 눌러 촬영합니다.</li>
+          <li><span class="icon">⏱️</span>셔터 버튼을 누르면 <strong>3·2·1 카운트다운</strong> 후 자동 촬영됩니다.</li>
+          <li><span class="icon orange">⚠️</span>카운트다운 중 다시 볼륨 버튼을 누르면 <strong>취소</strong>됩니다.</li>
+          <li><span class="icon">🔍</span>촬영 후 <strong>AI 유사도 검사</strong>가 진행됩니다.</li>
+          <li><span class="icon green">✅</span>사진이 마음에 들면 <em>확인</em>, 다시 찍으려면 <em>재촬영</em>을 탭합니다.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 볼륨 버튼 활용 (장갑 착용 시 권장)</strong>
+          볼륨 올리기 / 내리기 버튼 중 어느 쪽이든 셔터로 작동합니다. 장갑을 끼고도 쉽게 촬영할 수 있습니다.
+        </div>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#0f172a"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- camera preview -->
+          <rect x="8" y="16" width="124" height="160" rx="12" fill="#1a2535"/>
+          <!-- floor plan mockup in camera -->
+          <rect x="24" y="34" width="92" height="110" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+          <rect x="34" y="44" width="36" height="28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+          <rect x="78" y="44" width="28" height="28" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+          <rect x="34" y="82" width="72" height="32" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+          <text x="70" y="104" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="7">도면 영역</text>
+          <!-- corner brackets -->
+          <path d="M24 36 L24 44 L32 44" stroke="#14b8a6" stroke-width="2" fill="none"/>
+          <path d="M116 36 L116 44 L108 44" stroke="#14b8a6" stroke-width="2" fill="none"/>
+          <path d="M24 160 L24 152 L32 152" stroke="#14b8a6" stroke-width="2" fill="none"/>
+          <path d="M116 160 L116 152 L108 152" stroke="#14b8a6" stroke-width="2" fill="none"/>
+          <!-- top bar -->
+          <text x="70" y="26" text-anchor="middle" fill="white" font-size="8" font-weight="700">① 도면 촬영</text>
+          <!-- bottom controls -->
+          <rect x="8" y="184" width="124" height="84" rx="12" fill="#1e293b"/>
+          <!-- shutter button -->
+          <circle cx="70" cy="226" r="22" fill="white" opacity="0.15"/>
+          <circle cx="70" cy="226" r="18" fill="white"/>
+          <circle cx="70" cy="226" r="14" fill="none" stroke="#94a3b8" stroke-width="1.5"/>
+          <!-- timer indicator -->
+          <text x="70" y="198" text-anchor="middle" fill="#14b8a6" font-size="8">● 볼륨 버튼으로도 촬영</text>
+          <!-- vol button arrow -->
+          <text x="18" y="215" fill="white" font-size="18">◁</text>
+          <text x="16" y="228" fill="#94a3b8" font-size="7">볼륨</text>
+          <text x="104" y="260" fill="white" font-size="8">음성🔊</text>
+        </svg>
+        <p>도면 촬영 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 4. 감독자 승인 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">4</span>감독자 승인 시스템</h3>
+    <div class="approval-notice">
+      <h4>⚡ 승인은 각 단계마다 필요합니다</h4>
+      <p>도면 확인 → 장소 지정 → 작업 전 촬영 → 작업 중 촬영 → 최종 완료, 총 5회 감독자 승인이 필요합니다.</p>
+    </div>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">🔢</span>승인 화면에서 <strong>4자리 숫자 코드</strong>가 크게 표시됩니다.</li>
+          <li><span class="icon">📲</span>이 코드를 <strong>감독자(PC 관리자)</strong>에게 보여줍니다.</li>
+          <li><span class="icon green">💡</span>감독자가 PC 화면에서 해당 코드를 입력하면 <strong>자동으로 승인</strong>됩니다.</li>
+          <li><span class="icon">🌐</span>인터넷 연결이 없을 경우: 감독자가 핸드폰 화면 입력창에 코드를 직접 입력합니다.</li>
+          <li><span class="icon">🔅</span>승인 대기 중에는 배터리 절약을 위해 <strong>화면이 자동으로 어두워집니다</strong>.</li>
+          <li><span class="icon green">✅</span>승인 완료 시 진동 + 음성 <em>"승인되었습니다"</em>와 함께 다음 단계로 이동합니다.</li>
+        </ul>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#111827"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <text x="70" y="50" text-anchor="middle" fill="white" font-size="10" font-weight="800">감독자 승인 요청</text>
+          <text x="70" y="68" text-anchor="middle" fill="#94a3b8" font-size="8">아래 코드를 감독자에게 보여주세요</text>
+          <!-- big code display -->
+          <rect x="16" y="82" width="108" height="70" rx="14" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+          <text x="70" y="132" text-anchor="middle" fill="white" font-size="42" font-weight="900">5827</text>
+          <text x="70" y="148" text-anchor="middle" fill="#14b8a6" font-size="8">승인 대기 중...</text>
+          <!-- offline input -->
+          <text x="70" y="175" text-anchor="middle" fill="#64748b" font-size="8">오프라인 직접 입력:</text>
+          <rect x="20" y="180" width="80" height="26" rx="7" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+          <text x="60" y="198" text-anchor="middle" fill="#94a3b8" font-size="11">_ _ _ _</text>
+          <rect x="104" y="180" width="28" height="26" rx="7" fill="#14b8a6"/>
+          <text x="118" y="198" text-anchor="middle" fill="white" font-size="9" font-weight="700">확인</text>
+          <!-- dim screen note -->
+          <rect x="16" y="220" width="108" height="30" rx="8" fill="rgba(255,255,255,0.04)"/>
+          <text x="70" y="234" text-anchor="middle" fill="#475569" font-size="8">🔅 배터리 절약 모드</text>
+          <text x="70" y="246" text-anchor="middle" fill="#475569" font-size="7">(화면 밝기 자동 감소)</text>
+        </svg>
+        <p>승인 코드 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 5. 촬영 장소 지정 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">5</span>2단계: 촬영 장소 지정</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">🎙️</span>음성 안내: <em>"촬영 장소를 지정하세요. 화면을 탭하면 마커가 추가됩니다"</em></li>
+          <li><span class="icon">📍</span>촬영된 도면 이미지 위에서 <strong>촬영할 장소를 손가락으로 탭</strong>합니다.</li>
+          <li><span class="icon green">✏️</span>마커가 생기면 장소 이름을 입력합니다 (예: 주방, 화장실, 거실 등)</li>
+          <li><span class="icon">➕</span>추가하려면 다시 다른 위치를 탭합니다. 원하는 만큼 장소를 지정할 수 있습니다.</li>
+          <li><span class="icon red">✕</span>잘못 지정한 마커는 탭 → 삭제 버튼으로 제거합니다.</li>
+          <li><span class="icon green">✅</span>장소 지정 완료 후 <em>장소 지정 완료</em> 버튼을 탭합니다.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 Tip</strong>
+          작업 전·중·후 사진은 여기서 지정한 장소 수만큼 각각 촬영됩니다. 중요한 곳을 빠짐없이 지정하세요.
+        </div>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#f0f4f8"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- header -->
+          <rect x="8" y="16" width="124" height="32" rx="12" fill="#1e293b"/>
+          <text x="70" y="36" text-anchor="middle" fill="white" font-size="9" font-weight="700">② 촬영 장소 지정  (3곳 선택됨)</text>
+          <!-- floor plan -->
+          <rect x="12" y="54" width="116" height="130" rx="8" fill="white" stroke="#e2e8f0" stroke-width="1"/>
+          <!-- floor plan lines -->
+          <rect x="20" y="62" width="50" height="40" fill="none" stroke="#94a3b8" stroke-width="1"/>
+          <text x="45" y="86" text-anchor="middle" fill="#94a3b8" font-size="7">주방</text>
+          <rect x="78" y="62" width="40" height="40" fill="none" stroke="#94a3b8" stroke-width="1"/>
+          <text x="98" y="86" text-anchor="middle" fill="#94a3b8" font-size="7">화장실</text>
+          <rect x="20" y="110" width="98" height="60" fill="none" stroke="#94a3b8" stroke-width="1"/>
+          <text x="69" y="144" text-anchor="middle" fill="#94a3b8" font-size="7">거실</text>
+          <!-- markers -->
+          <circle cx="45" cy="82" r="8" fill="#ef4444"/>
+          <text x="45" y="86" text-anchor="middle" fill="white" font-size="8" font-weight="900">1</text>
+          <text x="45" y="100" text-anchor="middle" fill="#ef4444" font-size="7">주방</text>
+          <circle cx="98" cy="82" r="8" fill="#f59e0b"/>
+          <text x="98" y="86" text-anchor="middle" fill="white" font-size="8" font-weight="900">2</text>
+          <text x="98" y="100" text-anchor="middle" fill="#f59e0b" font-size="7">화장실</text>
+          <circle cx="69" cy="140" r="8" fill="#10b981"/>
+          <text x="69" y="144" text-anchor="middle" fill="white" font-size="8" font-weight="900">3</text>
+          <text x="69" y="158" text-anchor="middle" fill="#10b981" font-size="7">거실</text>
+          <!-- instruction -->
+          <text x="70" y="198" text-anchor="middle" fill="#64748b" font-size="8">도면을 탭하여 촬영 장소를 지정하세요</text>
+          <!-- complete button -->
+          <rect x="20" y="208" width="100" height="32" rx="10" fill="url(#grad1)"/>
+          <text x="70" y="229" text-anchor="middle" fill="white" font-size="11" font-weight="700">장소 지정 완료</text>
+          <!-- count -->
+          <rect x="16" y="248" width="108" height="12" rx="4" fill="rgba(14,165,233,0.1)"/>
+          <text x="70" y="258" text-anchor="middle" fill="#0ea5e9" font-size="7">3개 장소 지정됨 → 단계별 각 3장씩 촬영</text>
+        </svg>
+        <p>장소 지정 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 6. 작업 전/중/후 촬영 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">6</span>3~5단계: 작업 전 · 중 · 후 사진 촬영</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon">🎙️</span>음성 안내가 <em>"1번 장소, 주방, 작업 전 촬영하세요"</em>처럼 어느 곳을 찍어야 하는지 알려줍니다.</li>
+          <li><span class="icon">👻</span><strong>작업 중·후</strong> 촬영 시 작업 전 사진이 <strong>반투명하게 오버랩</strong>되어 같은 위치에서 찍도록 도움을 줍니다.</li>
+          <li><span class="icon">📊</span>상단에 <strong>AI 유사도 점수</strong>가 표시됩니다 (동일한 장소인지 확인).</li>
+          <li><span class="icon orange">⚠️</span>AI가 유사도 낮음으로 판단하면 경고가 표시되지만, <strong>재촬영 또는 그대로 진행</strong>을 선택할 수 있습니다.</li>
+          <li><span class="icon">💧</span>촬영된 사진에는 자동으로 <strong>날짜·시간·현장명 워터마크</strong>가 삽입됩니다.</li>
+          <li><span class="icon green">✅</span>확인 → 다음 장소로 자동 이동합니다. 모든 장소 촬영 완료 시 승인 단계로 이동합니다.</li>
+        </ul>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#0f172a"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- camera preview -->
+          <rect x="8" y="16" width="124" height="170" rx="12" fill="#1a2535"/>
+          <!-- ghost overlay (작업전 사진) -->
+          <rect x="20" y="28" width="100" height="80" rx="4" fill="rgba(255,255,255,0.08)"/>
+          <text x="70" y="62" text-anchor="middle" fill="rgba(255,255,255,0.3)" font-size="8">이전 사진 (반투명)</text>
+          <text x="70" y="74" text-anchor="middle" fill="rgba(255,255,255,0.2)" font-size="7">(같은 위치에서 촬영)</text>
+          <!-- corner brackets live camera -->
+          <path d="M20 28 L20 36 L28 36" stroke="#f59e0b" stroke-width="2" fill="none"/>
+          <path d="M120 28 L120 36 L112 36" stroke="#f59e0b" stroke-width="2" fill="none"/>
+          <path d="M20 106 L20 98 L28 98" stroke="#f59e0b" stroke-width="2" fill="none"/>
+          <path d="M120 106 L120 98 L112 98" stroke="#f59e0b" stroke-width="2" fill="none"/>
+          <!-- phase label -->
+          <rect x="12" y="118" width="60" height="18" rx="6" fill="#f59e0b"/>
+          <text x="42" y="131" text-anchor="middle" fill="white" font-size="8" font-weight="700">작업 중  2/3</text>
+          <!-- similarity -->
+          <rect x="78" y="118" width="52" height="18" rx="6" fill="rgba(20,184,166,0.2)" stroke="#14b8a6" stroke-width="1"/>
+          <text x="104" y="131" text-anchor="middle" fill="#14b8a6" font-size="7" font-weight="700">유사도 87%</text>
+          <!-- spot indicator -->
+          <text x="70" y="152" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="8">📍 2번 장소: 화장실</text>
+          <!-- countdown overlay -->
+          <text x="70" y="172" text-anchor="middle" fill="white" font-size="28" font-weight="900">3</text>
+          <!-- bottom -->
+          <rect x="8" y="194" width="124" height="74" rx="12" fill="#1e293b"/>
+          <circle cx="70" cy="231" r="20" fill="white" opacity="0.15"/>
+          <circle cx="70" cy="231" r="16" fill="white"/>
+          <text x="70" y="198" text-anchor="middle" fill="#94a3b8" font-size="7">🔊 볼륨버튼 = 셔터</text>
+          <text x="20" y="254" fill="#94a3b8" font-size="7">재촬영</text>
+          <text x="100" y="254" fill="#14b8a6" font-size="7">확인→</text>
+        </svg>
+        <p>작업 중 촬영 화면</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 7. 편의 기능 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">7</span>편의 기능 총정리</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px;">
+      <div style="background:#f0fdf4;border-radius:10px;padding:14px;border:1px solid #bbf7d0;">
+        <div style="font-size:14px;font-weight:700;color:#065f46;margin-bottom:6px;">🔊 볼륨 버튼 셔터</div>
+        <p style="font-size:12px;color:#047857;">볼륨 올리기·내리기 버튼 중 어느 쪽이든 셔터 역할을 합니다. 장갑을 끼고도 쉽게 촬영할 수 있습니다.</p>
+      </div>
+      <div style="background:#f0f9ff;border-radius:10px;padding:14px;border:1px solid #bae6fd;">
+        <div style="font-size:14px;font-weight:700;color:#0369a1;margin-bottom:6px;">⏱️ 3초 카운트다운</div>
+        <p style="font-size:12px;color:#0284c7;">셔터 버튼 클릭 → 3·2·1 카운트다운 후 자동 촬영. 카운트다운 중 볼륨 버튼을 누르면 취소됩니다.</p>
+      </div>
+      <div style="background:#fdf4ff;border-radius:10px;padding:14px;border:1px solid #e9d5ff;">
+        <div style="font-size:14px;font-weight:700;color:#6b21a8;margin-bottom:6px;">🎙️ 한국어 TTS 안내</div>
+        <p style="font-size:12px;color:#7c3aed;">각 단계마다 음성으로 안내합니다. 우측 하단 🔊/🔇 버튼으로 음성을 켜거나 끌 수 있습니다.</p>
+      </div>
+      <div style="background:#fff7ed;border-radius:10px;padding:14px;border:1px solid #fed7aa;">
+        <div style="font-size:14px;font-weight:700;color:#92400e;margin-bottom:6px;">📳 햅틱 피드백</div>
+        <p style="font-size:12px;color:#c2410c;">촬영 시, 승인 완료 시, 단계 이동 시 진동으로 피드백을 제공합니다. 소리 없이도 확인 가능합니다.</p>
+      </div>
+      <div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid #e2e8f0;">
+        <div style="font-size:14px;font-weight:700;color:#334155;margin-bottom:6px;">🔅 화면 자동 감소</div>
+        <p style="font-size:12px;color:#475569;">승인 대기 중 화면이 자동으로 어두워져 배터리를 절약합니다. 승인 후 자동 복구됩니다.</p>
+      </div>
+      <div style="background:#fefce8;border-radius:10px;padding:14px;border:1px solid #fde68a;">
+        <div style="font-size:14px;font-weight:700;color:#78350f;margin-bottom:6px;">🗺️ 카카오 내비 버튼</div>
+        <p style="font-size:12px;color:#92400e;">우측 하단 노란 원형 버튼을 언제든 탭하면 현장까지 카카오 내비가 즉시 실행됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모바일 8. 완료 및 오프라인 -->
+  <div class="step-card">
+    <h3><span class="step-num mo">8</span>작업 완료 · 오프라인 모드</h3>
+    <div class="step-layout">
+      <div class="step-desc">
+        <ul>
+          <li><span class="icon green">🎉</span>모든 촬영·승인 완료 후 <em>"수고하셨습니다! 모든 작업이 완료되었습니다"</em> 화면이 표시됩니다.</li>
+          <li><span class="icon green">✅</span><em>작업 완료</em> 버튼을 탭하면 PC 대시보드에 완료 상태가 전송됩니다.</li>
+          <li><span class="icon orange">⚠️</span>작업 완료 전 앱을 나가려 하면 <strong>"작업이 완료되지 않았습니다"</strong> 경고가 표시됩니다.</li>
+          <li><span class="icon">📶</span><strong>오프라인 모드</strong>: 인터넷이 없을 때 사진은 핸드폰에 저장됩니다.</li>
+          <li><span class="icon green">☁️</span>인터넷 연결 복구 시 <strong>저장된 사진이 자동으로 서버에 업로드</strong>됩니다.</li>
+          <li><span class="icon">🗂️</span>사진은 <em>월/일/현장명</em> 폴더 구조로 정리되며, <strong>3개월 후 자동 삭제</strong>됩니다.</li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 사진 저장 구조</strong>
+          photos / 2026-05 / 2026-05-10 / 강남현장 / 작업전_142530.jpg
+        </div>
+      </div>
+      <div class="step-img">
+        <svg width="140" height="280" viewBox="0 0 140 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="136" height="276" rx="20" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="#f0fdf4"/>
+          <rect x="52" y="6" width="36" height="6" rx="3" fill="#475569"/>
+          <!-- completion screen -->
+          <rect x="8" y="16" width="124" height="252" rx="12" fill="url(#complGrad)"/>
+          <defs>
+            <linearGradient id="complGrad" x1="8" y1="16" x2="132" y2="268" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#059669"/>
+              <stop offset="100%" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+          <circle cx="70" cy="100" r="36" fill="rgba(255,255,255,0.15)"/>
+          <text x="70" y="112" text-anchor="middle" fill="white" font-size="36">✅</text>
+          <text x="70" y="158" text-anchor="middle" fill="white" font-size="13" font-weight="900">작업 완료!</text>
+          <text x="70" y="175" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="9">수고하셨습니다 😊</text>
+          <text x="70" y="192" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="8">모든 사진이 서버에 저장되었습니다</text>
+          <!-- stats -->
+          <rect x="18" y="202" width="44" height="34" rx="8" fill="rgba(255,255,255,0.15)"/>
+          <text x="40" y="216" text-anchor="middle" fill="white" font-size="16" font-weight="900">12</text>
+          <text x="40" y="230" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="7">촬영 완료</text>
+          <rect x="48" y="202" width="44" height="34" rx="8" fill="rgba(255,255,255,0.15)"/>
+          <text x="70" y="216" text-anchor="middle" fill="white" font-size="16" font-weight="900">5</text>
+          <text x="70" y="230" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="7">승인 완료</text>
+          <rect x="78" y="202" width="44" height="34" rx="8" fill="rgba(255,255,255,0.15)"/>
+          <text x="100" y="216" text-anchor="middle" fill="white" font-size="16" font-weight="900">3</text>
+          <text x="100" y="230" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-size="7">현장 장소</text>
+          <!-- close button -->
+          <rect x="20" y="246" width="100" height="14" rx="6" fill="rgba(255,255,255,0.2)"/>
+          <text x="70" y="257" text-anchor="middle" fill="white" font-size="8" font-weight="700">목록으로 돌아가기</text>
+        </svg>
+        <p>작업 완료 화면</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 빠른 참조 -->
+<div class="section">
+  <div style="background:white;border-radius:20px;padding:32px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:24px;">⚡ 빠른 참조 카드</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+      <div>
+        <h3 style="font-size:14px;font-weight:700;color:#0ea5e9;margin-bottom:12px;">🖥️ PC 자주 쓰는 기능</h3>
+        <table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">현장 상태 변경</td><td style="padding:6px 0;font-weight:600;color:#334155;">대시보드 → 완료 처리 버튼</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">새 작업 배정</td><td style="padding:6px 0;font-weight:600;color:#334155;">작업 배정 → + 새 배정</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">작업자 GPS 확인</td><td style="padding:6px 0;font-weight:600;color:#334155;">대시보드 → 지도 관제</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">정산 처리</td><td style="padding:6px 0;font-weight:600;color:#334155;">현장 → 상세 보기 및 정산</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b;">승인 코드 입력</td><td style="padding:6px 0;font-weight:600;color:#334155;">해당 현장 상세 → 승인 탭</td></tr>
+        </table>
+      </div>
+      <div>
+        <h3 style="font-size:14px;font-weight:700;color:#10b981;margin-bottom:12px;">📱 모바일 자주 쓰는 동작</h3>
+        <table style="width:100%;font-size:12px;border-collapse:collapse;">
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">사진 촬영</td><td style="padding:6px 0;font-weight:600;color:#334155;">셔터 버튼 또는 볼륨 버튼</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">카운트다운 취소</td><td style="padding:6px 0;font-weight:600;color:#334155;">카운트다운 중 볼륨 버튼</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">음성 안내 끄기</td><td style="padding:6px 0;font-weight:600;color:#334155;">우측 하단 🔊 버튼 탭</td></tr>
+          <tr style="border-bottom:1px solid #f1f5f9;"><td style="padding:6px 0;color:#64748b;">내비게이션 실행</td><td style="padding:6px 0;font-weight:600;color:#334155;">우측 하단 🟡 버튼 탭</td></tr>
+          <tr><td style="padding:6px 0;color:#64748b;">승인 코드 표시</td><td style="padding:6px 0;font-weight:600;color:#334155;">각 단계 완료 후 자동 표시</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 푸터 -->
+<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px;">
+  <p style="font-weight:700;color:#334155;margin-bottom:8px;">크린케어시스템 v1.0.4</p>
+  <p>문의: 시스템 관리자에게 연락해 주세요 | 최종 업데이트: 2026년 5월</p>
+</div>
+
+</body>
+</html>

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -80,7 +80,7 @@ export default function SignupPage() {
           
           <h1 className="text-2xl font-black text-slate-800 mb-2">관리자/사용자 회원가입</h1>
           <p className="text-sm font-medium text-slate-500 mb-8 text-center">
-            클린케어 시스템에 접속할 계정을 생성합니다.
+            크린케어 시스템에 접속할 계정을 생성합니다.
           </p>
 
           <form onSubmit={handleSignup} className="w-full space-y-4">

@@ -15,47 +15,59 @@ export function useWorkerLocations() {
   const [locations, setLocations] = useState<WorkerLocationData[]>([]);
 
   useEffect(() => {
-    const q = query(
-      collection(db, 'systemUsers'),
-      where('isGpsActive', '==', true)
-    );
-    const unsub = onSnapshot(q, (snap) => {
-      const data: WorkerLocationData[] = snap.docs
+    // isGpsActive 인덱스가 없을 때를 대비한 폴백 패턴
+    // 첫 번째 구독이 실패하면 두 번째 구독으로 대체
+    let unsubscribe: (() => void) | null = null;
+    let settled = false;
+
+    const handleData = (docs: Array<{ id: string; data: () => Record<string, unknown> }>) => {
+      const data: WorkerLocationData[] = docs
         .map(d => {
           const raw = d.data();
           return {
             uid: d.id,
-            name: raw.name ?? '작업자',
-            currentLat: raw.currentLat,
-            currentLng: raw.currentLng,
-            locationUpdatedAt: raw.locationUpdatedAt ?? 0,
-            isGpsActive: raw.isGpsActive ?? false,
+            name: (raw.name as string) ?? '작업자',
+            currentLat: raw.currentLat as number,
+            currentLng: raw.currentLng as number,
+            locationUpdatedAt: (raw.locationUpdatedAt as number) ?? 0,
+            isGpsActive: (raw.isGpsActive as boolean) ?? false,
           };
         })
-        .filter(w => w.currentLat != null && w.currentLng != null);
+        .filter(w => w.isGpsActive && w.currentLat != null && w.currentLng != null);
       setLocations(data);
-    }, (err) => {
-      // isGpsActive 인덱스 없을 때 폴백: 전체 조회 후 클라이언트 필터
-      console.warn('[useWorkerLocations] 인덱스 없음, 폴백 사용:', err.message);
+    };
+
+    try {
+      const q = query(
+        collection(db, 'systemUsers'),
+        where('isGpsActive', '==', true)
+      );
+      unsubscribe = onSnapshot(
+        q,
+        (snap) => {
+          settled = true;
+          handleData(snap.docs);
+        },
+        () => {
+          // 인덱스 오류 시 전체 조회 폴백
+          if (settled) return;
+          if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+          const fallbackQ = query(collection(db, 'systemUsers'));
+          unsubscribe = onSnapshot(fallbackQ, (snap2) => {
+            handleData(snap2.docs);
+          });
+        }
+      );
+    } catch {
       const fallbackQ = query(collection(db, 'systemUsers'));
-      onSnapshot(fallbackQ, (snap2) => {
-        const data: WorkerLocationData[] = snap2.docs
-          .map(d => {
-            const raw = d.data();
-            return {
-              uid: d.id,
-              name: raw.name ?? '작업자',
-              currentLat: raw.currentLat,
-              currentLng: raw.currentLng,
-              locationUpdatedAt: raw.locationUpdatedAt ?? 0,
-              isGpsActive: raw.isGpsActive ?? false,
-            };
-          })
-          .filter(w => w.isGpsActive && w.currentLat != null && w.currentLng != null);
-        setLocations(data);
+      unsubscribe = onSnapshot(fallbackQ, (snap) => {
+        handleData(snap.docs);
       });
-    });
-    return () => unsub();
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   return locations;

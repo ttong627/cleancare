@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -56,7 +56,7 @@ export default function LoginPage() {
             <ShieldCheck size={32} className="text-white" />
           </div>
           
-          <h1 className="text-2xl font-black text-slate-800 mb-2">클린케어 관리자 로그인</h1>
+          <h1 className="text-2xl font-black text-slate-800 mb-2">크린케어 관리자 로그인</h1>
           <p className="text-sm font-medium text-slate-500 mb-8 text-center">
             허가된 관리자만 접근할 수 있는 시스템입니다.<br/>
             부여받은 계정 정보를 입력해주세요.

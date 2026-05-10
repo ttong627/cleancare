@@ -7,7 +7,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 60, // 1분 캐싱 (Zero-Loading)
+        staleTime: Infinity, // Firestore 실시간 구독이 캐시를 직접 갱신
         refetchOnWindowFocus: false,
       },
     },

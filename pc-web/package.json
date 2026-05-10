@@ -4,18 +4,21 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && node fix-rsc.js",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "@tanstack/react-query": "^5.100.9",
+    "@types/jszip": "^3.4.0",
     "@types/nodemailer": "^8.0.0",
     "date-fns": "^4.1.0",
+    "exceljs": "^4.4.0",
     "firebase": "^12.13.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
+    "jszip": "^3.10.1",
     "lucide-react": "^1.14.0",
     "next": "16.2.6",
     "nodemailer": "^8.0.7",
@@ -26,6 +29,7 @@
     "react-hot-toast": "^2.6.0",
     "react-kakao-maps-sdk": "^1.2.1",
     "recharts": "^3.8.1",
+    "xlsx": "^0.18.5",
     "zustand": "^5.0.13"
   },
   "devDependencies": {
