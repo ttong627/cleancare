@@ -372,7 +372,10 @@ class _ARCameraScreenState extends State<ARCameraScreen> with WidgetsBindingObse
       final arSpots  = data['arSpots']      as Map<String, dynamic>?;
       final counter  = (data['arSpotCounter'] as num?)?.toInt() ?? 0;
       final savedMode = data['photoMode'] as String?;
-      if (savedMode != null && mounted) setState(() => _photoMode = savedMode);
+      if (savedMode != null && mounted) setState(() {
+        _photoMode = savedMode;
+        if (_photoMode == 'ba' && _filterTab == 'during') _filterTab = 'all';
+      });
       if (arSpots != null && arSpots.isNotEmpty) {
         final spots = arSpots.entries
             .map((e) => WorkSpot.fromFirestore(e.key, e.value as Map<String, dynamic>))
@@ -1360,7 +1363,7 @@ class _ARCameraScreenState extends State<ARCameraScreen> with WidgetsBindingObse
     final tabs = [
       ('all',    '전체',   Icons.grid_view_rounded),
       ('before', '작업전', Icons.camera_alt),
-      ('during', '작업중', Icons.layers),
+      if (_photoMode != 'ba') ('during', '작업중', Icons.layers),
       ('after',  '작업후', Icons.check_circle),
     ];
     return Container(
